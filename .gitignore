@@ -77,3 +77,26 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+
+# Local or unnecessary files
+# =========================
+
+TirocinioMolecola/Makefile
+TirocinioMolecola/Makefile.Release
+TirocinioMolecola/Makefile.Debug
+TirocinioMolecola/object_script.Prove.Debug
+TirocinioMolecola/object_script.Prove.Release
+TirocinioMolecola/object_script.Prove
+TirocinioMolecola/release
+TirocinioMolecola/debug
+build-Prove-Desktop_Qt_5_5_1_MinGW_32bit-Debug/
+build-TirocinioMolecola-Desktop_Qt_5_5_1_MinGW_32bit-Debug/
+
+
+
+
+
+
+
+
