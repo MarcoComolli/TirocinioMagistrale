@@ -1,0 +1,73 @@
+* gui basics
+* custom window borders
+* atom table
+* cutplane
+* cutplane gui
+* paint modes (per atom, ...)
+* pdb load
+* mol 2 shape
+* ball impostors
+* DoF
+* FoV
+* background gui
+* fog
+* ao-ball
+* direct light
+* two way lights
+* reflections
+* colored lights
+* flat illumination
+* flat highlights
+* borders
+* sem-mode
+* direct shadows
+* direct shadow, 2nd light
+* direct shadow, PCF
+* keyboard control of trackballs
+* permeable shadows
+* screenshot png jpg
+* screenshot png transparent
+- animation modalities dialog
+- screenshot gif
+- performance settings
+- atom color dialog
+- about panel remarks
+- about panel stuff
+- info panel
+* preset panel
+* presets
+- more+better presets
+* remember last folders
+- website
+* GUI: round buttons
+- GUI: better "yes/no" sliders.
+* consistent light dirs for AO (not rerolled)
+- copyright notice in all files
+- help screen
+- control FoV focus with mouse, somehow
+* GUI: tab ordering
+- GUI: tool tip texts
+
+NOT NEEDED IN 1st VERS?
+- variable saturation for colored lights
+- faster ao (multiple shadowmaps per pass)
+* code cleaning: standarize uniforms/defines/attributes of shaders
+- identification of bonds
+- loading of bonds
+- impostors tubes
+- licorice / ball'n'sticks
+- ao tubes
+- halos
+* simplified lighting (when light is from 0,0,1)
+
+BUGS:
+* strange can't load molecule bug
+* fog with cutplane
+- fog with perspective
+- shadow-map size not adaptive
+- blur range not adaptive with screen size
+* near clip plane too close
+* DoF sliders disabled on settings?
+- problems when direct light completely OFF and light simple
+- snapshot dialog: no keyboard input!
+- cut plane rotates wrong on 1f2n.pdb
