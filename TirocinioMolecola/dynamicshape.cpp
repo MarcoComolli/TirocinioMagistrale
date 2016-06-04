@@ -130,6 +130,7 @@ void DynamicShape::doPhysicsStep(Scalar dt, const PairStatistics& ps){
     //forza = f(posNow)
     //acc = f/m
     Scalar damp = 1 - prefs.damp;
+    std::cout << "prova: " << prova << std::endl;
     Scalar speed = 0;
     qmol::Pos pNext;
     for (int i = 0; i < ps.totalUniqueAtoms; ++i) {
@@ -310,6 +311,12 @@ void DynamicShape::calculatePSBonds(PairStatistics& ps){
     std::cout << "Soft: "  << cSoft << std::endl;
     std::cout << "Hard: "  << cHard << std::endl;
 
+    prefs.intersectCnt = cInt;
+    prefs.removedCnt = cRem;
+    prefs.softCnt = cSoft;
+    prefs.hardCnt = cHard;
+
+    std::cout << "AGGIORNO IL REMOVEEEEEED "  << prefs.removedCnt<< std::endl;
 
     ps.orderPairsByBound();
 }
