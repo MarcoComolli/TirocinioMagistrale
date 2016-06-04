@@ -21,7 +21,7 @@ public:
 
     MyRenderer();
 
-    void init(Preferences prefs);
+    void init();
 
     void generateBuffers(Preferences prefs);
     void updateBuffers(PairStatistics ps);

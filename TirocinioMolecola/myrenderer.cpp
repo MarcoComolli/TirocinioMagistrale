@@ -451,14 +451,14 @@ static vector<vec3> generateCubeNormals(vector<vec3> cubes){
 
 }
 
-void MyRenderer::init(Preferences prefs){
+void MyRenderer::init(){
     GLenum res = glewInit();
     if (res != GLEW_OK) {
         glewGetErrorString(res);
         throw std::runtime_error("A GLEW error occurred");
     }
 
-    generateBuffers(prefs);
+    generateBuffers(ds.prefs);
 
     glClearColor(0.17f, 0.20f, 0.20f, 0.0f);
 
@@ -647,6 +647,7 @@ static vector<vec3> generateColors(vector<vec3> cubesVertices){
     }
 
     return cols;
+
 
 }
 

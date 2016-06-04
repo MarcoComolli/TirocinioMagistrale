@@ -6,8 +6,6 @@
 #include <qutemolLib/shape.h>
 #include <qutemolLib/shapingOptions.h>
 #include <qutemolLib/atomTable.h>
-#include <atomposition.h>
-#include <moleculeconnections.h>
 #include <atompair.h>
 #include <myrenderer.h>
 #include <AntTweakBar.h>
@@ -23,8 +21,7 @@ extern MyRenderer renderer;
 void processKey(unsigned char);
 void processMouse(int,int,int,int,int);
 void setSpecKeyStatus(int);
-void initComponents(Preferences prefs);
-void testSprings(Preferences prefs);
+void initComponents(Preferences& prefs);
 void mouseMotion(int x, int y);
 
 void idleCallback(){
@@ -66,17 +63,12 @@ static void terminateGlut(){
 }
 
 void TW_CALL reloadAll(void * prefs){
-    initComponents(*(Preferences *)(prefs));
+    initComponents(*(Preferences *) (prefs));
     renderer.quaternion = Vec4(0,0,0,1);
-    renderer.init(*(Preferences *)(prefs));
+    renderer.init();
 }
 
-void TW_CALL applyPrefs(void * prefs){
-    renderer.init(*(Preferences *)(prefs));
-}
-
-void initTweakBar(Preferences prefs)
-{
+void initTweakBar(Preferences prefs, DynamicShape& ds){
     TwInit(TW_OPENGL, NULL);
     TwWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -84,7 +76,10 @@ void initTweakBar(Preferences prefs)
 
 
     myBar = TwNewBar("Parameters");
-    TwDefine(" Parameters size='200 400' color='15 225 15' "); // change default tweak bar size and color
+    TwDefine(" Parameters size='200 420' color='0 170 0' text=light"); // change default tweak bar size and color
+    TwDefine(" Parameters alpha = 30 valueswidth=60 iconalign=horizontal iconpos=tl ");
+    TwDefine(" GLOBAL iconmargin='5 5' ");
+    TwDefine(" GLOBAL fontsize=2 fontstyle=default contained=true buttonalign=left ");
 
     TwAddVarRW(myBar, "Extra bonds", TW_TYPE_INT32, &prefs.numberExtraBonds , " min=0 max=500000 step=100 keyIncr=z keyDecr=x help=' '");
 
@@ -94,27 +89,32 @@ void initTweakBar(Preferences prefs)
     TwAddVarRW(myBar, "Min variance", TW_TYPE_FLOAT, &prefs.minVarianceTrhesh, " min=0.0 max=5.0 step=0.01 keyIncr=o keyDecr=p help=' '");
     TwAddVarRW(myBar, "Max variance", TW_TYPE_FLOAT, &prefs.maxVarianceTrhesh, " min=0.0 max=20.0 step=0.01 keyIncr=k keyDecr=l help=' '");
     TwAddVarRW(myBar, "R", TW_TYPE_FLOAT, &prefs.R, " min=0.0 max=200.0 step=0.1 keyIncr=k keyDecr=l help=' '");
-    TwAddVarRW(myBar, "APPLICATION DISTANCE", TW_TYPE_FLOAT, &prefs.applicationDistance, " min=-10.0 max=10.0 step=0.01 keyIncr=k keyDecr=l help=' '");
+    TwAddVarRW(myBar, "APPLICATION DISTANCE", TW_TYPE_FLOAT, &prefs.applicationDistance, " min=-10.0 max=10.0 step=0.01 keyIncr=k keyDecr=l help=' ' ");
 
     TwAddSeparator(myBar,"sep0",NULL);
 
-    TwAddVarRW(myBar, "UseHARD", TW_TYPE_BOOL8, &prefs.hardBonds, "label='Use HARD' key=8 help='Process hard bonds.'");
-    TwAddVarRW(myBar, "UseSOFT", TW_TYPE_BOOL8, &prefs.softBonds, "label='Use SOFT' key=9 help='Process soft bonds.'");
+    TwAddVarRW(myBar, "UseHARD", TW_TYPE_BOOL8, &prefs.hardBonds, "label='Use HARD' key=8 help='Process hard bonds.' true='YES' false='NO' ");
+    TwAddVarRW(myBar, "UseSOFT", TW_TYPE_BOOL8, &prefs.softBonds, "label='Use SOFT' key=9 help='Process soft bonds.' true='YES' false='NO' ");
 
     TwAddSeparator(myBar,"sep1",NULL);
 
-    TwAddVarRW(myBar, "ShowINTERSECT", TW_TYPE_BOOL8, &prefs.showIntersectBonds, "label='Show INTERSECT' key=1 help='Show intersect bonds.'");
-    TwAddVarRW(myBar, "ShowHARD", TW_TYPE_BOOL8, &prefs.showHardBonds, "label='Show HARD' key=2 help='Show hard bonds.'");
-    TwAddVarRW(myBar, "ShowSOFT", TW_TYPE_BOOL8, &prefs.showSoftBonds, "label='Show SOFT' key=3 help='Show soft bonds.'");
+    TwAddVarRW(myBar, "ShowINTERSECT", TW_TYPE_BOOL8, &prefs.showIntersectBonds, "label='Show INTERSECT' key=1 help='Show intersect bonds.' true='YES' false='NO' group=Visualization ");
+    TwAddVarRW(myBar, "ShowHARD", TW_TYPE_BOOL8, &prefs.showHardBonds, "label='Show HARD' key=2 help='Show hard bonds.' true='YES' false='NO' group=Visualization ");
+    TwAddVarRW(myBar, "ShowSOFT", TW_TYPE_BOOL8, &prefs.showSoftBonds, "label='Show SOFT' key=3 help='Show soft bonds.' true='YES' false='NO' group=Visualization ");
+    TwAddVarRW(myBar, "Showgrid", TW_TYPE_BOOL8, &prefs.showGrid, "label='Show grid' key=space help='Show the grid' true='YES' false='NO' group=Visualization ");
 
     TwAddSeparator(myBar,"sep2",NULL);
 
-    TwAddVarRW(myBar, "Showgrid", TW_TYPE_BOOL8, &prefs.showGrid, "label='Show grid' key=space help='Show the grid'");
+    TwAddVarRO(myBar, "RemovedCnt", TW_TYPE_INT32, &prefs.removedCnt, "label='Removed:' group='Bonds number' ");
+    TwAddVarRO(myBar, "IntersectCnt", TW_TYPE_INT32, &prefs.intersectCnt, "label='Intersect:' group='Bonds number' ");
+    TwAddVarRO(myBar, "HardCnt", TW_TYPE_INT32, &prefs.hardCnt, "label='Hard' group='Bonds number' ");
+    TwAddVarRO(myBar, "SoftCnt", TW_TYPE_INT32, &prefs.softCnt, "label='Soft:' group='Bonds number' ");
+
+    TwAddVarRW(myBar, "Prova", TW_TYPE_INT32, &ds.prova, "label='prova:'  ");
+
+    std::cout << "PREFS NEL MAIN " << &prefs << std::endl;
 
     TwAddSeparator(myBar,"sep3",NULL);
-
-    //da aggiustare
-    //TwAddButton(myBar,"Aply!", applyPrefs, &prefs, NULL);
 
     TwAddButton(myBar,"Reload!", reloadAll, &prefs, NULL);
 
@@ -130,10 +130,10 @@ int main(int argc, char** argv){
     glutInitWindowPosition(5, 5);
     glutCreateWindow("Animated Mol");
 
-    Preferences prefs;
-    initComponents(prefs);
+    //Preferences prefs;
+    initComponents(renderer.ds.prefs);
     // Check if glew is ok
-    renderer.init(prefs);
+    renderer.init();
 
     glutReshapeFunc(reshapeCB);
 
@@ -147,7 +147,7 @@ int main(int argc, char** argv){
 
 
     //Preferences* prefs2 = new Preferences();
-    initTweakBar(prefs);
+    initTweakBar(renderer.ds.prefs, renderer.ds);
 
 
 

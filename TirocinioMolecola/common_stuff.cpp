@@ -5,8 +5,6 @@
 #include <qutemolLib/shape.h>
 #include <qutemolLib/shapingOptions.h>
 #include <qutemolLib/atomTable.h>
-#include <atomposition.h>
-#include <moleculeconnections.h>
 #include <atompair.h>
 #include <myrenderer.h>
 #include <dynamicshape.h>
@@ -118,18 +116,24 @@ void initGrid(DynamicShape& ds, SpatialGrid& gr){
             ((gr.gridX.size())*(gr.gridY.size()));
 }
 
-void initComponents(Preferences prefs){
+void initComponents(Preferences& prefs){
 
     vector<qmol::Shape> shapes = getShapes();
 
     DynamicShape& ds (renderer.ds);
     ds.copyFrom(shapes[0]);
+
+    std::cout << "prima: ds.prefs " << &ds.prefs << std::endl;
+    std::cout << "prima: prefs " << &prefs << std::endl;
     ds.prefs = prefs;
+    std::cout << "dopo: ds.prefs " << &ds.prefs << std::endl;
+    std::cout << "dopo: prefs " << &prefs << std::endl;
+
     SpatialGrid &gr(renderer.grid);
     initGrid(ds,gr);
 
     PairStatistics& ps (renderer.ps);
-    ps = gr.generatePairStatistcs(ds,3.4,prefs.numberExtraBonds);
+    ps = gr.generatePairStatistcs(ds,3.4,ds.prefs.numberExtraBonds);
 
     for (uint i = 0; i < shapes.size() ; i++) { //per ogni modello
         ps.add_shape(shapes[i]);

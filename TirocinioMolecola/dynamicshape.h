@@ -24,6 +24,7 @@ class DynamicShape
 {
 public:
     Preferences prefs;
+    int prova = 0;
 
     std::vector<DynamicBall> ball;
     std::vector<qmol::Tube> tube;

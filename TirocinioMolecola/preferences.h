@@ -26,6 +26,12 @@ public:
     qmol::Scalar R = 20;
     qmol::Scalar applicationDistance = 0.5;
 
+    int removedCnt = -1;
+    int intersectCnt = -1;
+    int hardCnt = -1;
+    int softCnt = -1;
+
+
 
 
     bool showGrid = false;
