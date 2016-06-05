@@ -80,6 +80,9 @@ GLuint modelMatrixID;
 
 GLuint lightID;
 
+GLuint lineColor;
+
+
 GLuint shaderProg;
 GLuint shaderNoLightProg;
 
@@ -332,6 +335,8 @@ static void CompileShaders(){
     lightID = glGetUniformLocation(shaderProgram, "LightPositionWorld");
     //assert(lightID != 0xFFFFFFFF);
 
+    lineColor = glGetUniformLocation(shaderProgram, "lineColor");
+    //assert(lineColor != 0xFFFFFFFF);
 
     shaderProg = shaderProgram;
     shaderNoLightProg = shaderNoLightProgram;
@@ -611,7 +616,7 @@ void MyRenderer::render(){
 
     //printCubes();
 
-    printLines();
+    //printLines();
 
     if(ds.prefs.showGrid){
         printGrid();
@@ -853,6 +858,8 @@ void MyRenderer::generateBuffers(Preferences prefs){
     DynamicBall b1,b2;
     vector<bool> showBonds = getBoundIndexesForRendering(prefs,ps);
 
+
+     glUniform3f(lineColor,0.5,1.0,1.0);
     if (showBonds[0]) {
         for (int i = ps.intersectStartIdx; i <= ps.intersectEndIdx; ++i) {
             a1 =  ps.pairs[i].atomID1;
@@ -880,6 +887,7 @@ void MyRenderer::generateBuffers(Preferences prefs){
         }
     }
 
+    glUniform3f(lineColor,0.0,1.0,0.0);
     if (showBonds[1]) {
         for (int i = ps.hardStartIdx; i <= ps.hardEndIdx; ++i) {
             a1 =  ps.pairs[i].atomID1;
@@ -907,6 +915,7 @@ void MyRenderer::generateBuffers(Preferences prefs){
         }
     }
 
+    glUniform3f(lineColor,0.5,1.0,0.5);
     if (showBonds[2]) {
         for (int i = ps.softStartIdx; i <= ps.softEndIdx; ++i) {
             a1 =  ps.pairs[i].atomID1;
@@ -1047,6 +1056,9 @@ void MyRenderer::updateBuffers(PairStatistics ps){
 
     vector<bool> showBonds = getBoundIndexesForRendering(ds.prefs,ps);
 
+
+
+    glUniform3f(lineColor,1.0,1.0,1.0);
     if (showBonds[0]) {
         for (int i = ps.intersectStartIdx; i <= ps.intersectEndIdx; ++i) {
             a1 =  ps.pairs[i].atomID1;
@@ -1067,9 +1079,15 @@ void MyRenderer::updateBuffers(PairStatistics ps){
             lines.push_back(v1);
             lines.push_back(v2);
             bounds.push_back(ps.pairs[i].constr);
+
+            glBegin(GL_LINES);
+            glVertex3f(v1.x, v1.y, v1.z);
+            glVertex3f(v2.x, v2.y, v2.z);
+            glEnd();
         }
     }
 
+    glUniform3f(lineColor,0.0,1.0,0.0);
     if (showBonds[1]) {
         for (int i = ps.hardStartIdx; i <= ps.hardEndIdx; ++i) {
             a1 =  ps.pairs[i].atomID1;
@@ -1090,9 +1108,15 @@ void MyRenderer::updateBuffers(PairStatistics ps){
             lines.push_back(v1);
             lines.push_back(v2);
             bounds.push_back(ps.pairs[i].constr);
+
+            glBegin(GL_LINES);
+            glVertex3f(v1.x, v1.y, v1.z);
+            glVertex3f(v2.x, v2.y, v2.z);
+            glEnd();
         }
     }
 
+    glUniform3f(lineColor,1.0,0.0,1.0);
     if (showBonds[2]) {
         for (int i = ps.softStartIdx; i <= ps.softEndIdx; ++i) {
             a1 =  ps.pairs[i].atomID1;
@@ -1113,6 +1137,10 @@ void MyRenderer::updateBuffers(PairStatistics ps){
             lines.push_back(v1);
             lines.push_back(v2);
             bounds.push_back(ps.pairs[i].constr);
+            glBegin(GL_LINES);
+            glVertex3f(v1.x, v1.y, v1.z);
+            glVertex3f(v2.x, v2.y, v2.z);
+            glEnd();
         }
     }
 

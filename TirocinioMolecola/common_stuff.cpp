@@ -123,11 +123,7 @@ void initComponents(Preferences& prefs){
     DynamicShape& ds (renderer.ds);
     ds.copyFrom(shapes[0]);
 
-    std::cout << "prima: ds.prefs " << &ds.prefs << std::endl;
-    std::cout << "prima: prefs " << &prefs << std::endl;
     ds.prefs = prefs;
-    std::cout << "dopo: ds.prefs " << &ds.prefs << std::endl;
-    std::cout << "dopo: prefs " << &prefs << std::endl;
 
     SpatialGrid &gr(renderer.grid);
     initGrid(ds,gr);
@@ -150,10 +146,19 @@ void initComponents(Preferences& prefs){
     ps.printStats();
 
     ps.updateDistancesFromShape(shapes[0]);
+}
 
+void recalcPS(){
+    PairStatistics& ps (renderer.ps);
+    SpatialGrid &gr(renderer.grid);
+    DynamicShape& ds (renderer.ds);
 
+    initGrid(ds,gr);
 
+    ps = gr.generatePairStatistcs(ds,3.4,ds.prefs.numberExtraBonds);
 
+    //ps.calculateStats();
+    //ds.calculatePSBonds(ps);
 }
 
 static int xStored = 0;

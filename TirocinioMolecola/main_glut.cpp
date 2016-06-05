@@ -23,14 +23,12 @@ void processMouse(int,int,int,int,int);
 void setSpecKeyStatus(int);
 void initComponents(Preferences& prefs);
 void mouseMotion(int x, int y);
+void recalcPS();
 
 
 void idleCallback(){
     renderer.ds.doPhysicsStep(1.0f/30.0f,renderer.ps);
     glutPostRedisplay();
-
-
-
 }
 
 void displayCallback(){
@@ -69,16 +67,45 @@ void TW_CALL reloadAll(void * prefs){
     renderer.init();
 }
 
-void TW_CALL SetCallback(const void *value, void *clientData)
-{
-    //std::cout << "SET CALLBACK!" << std::endl;
-    (*(Preferences *)(clientData)).softBonds = *(const bool *)value;  // for instance
+//setters
+void TW_CALL setCBShowSoftBonds(const void *value, void *clientData){
+    (*(Preferences *)(clientData)).showSoftBonds = *(const bool *)value;
+    renderer.generateBuffers((*(Preferences *)(clientData)));
 }
 
-void TW_CALL GetCallback(void *value, void *clientData)
-{
-     //   std::cout << "GET CALLBACK!" << std::endl;
-    *(bool *)value = (*(Preferences *)(clientData)).softBonds;  // for instance
+void TW_CALL setCBShowHardBonds(const void *value, void *clientData){
+    (*(Preferences *)(clientData)).showHardBonds = *(const bool *)value;
+    renderer.generateBuffers((*(Preferences *)(clientData)));
+}
+
+void TW_CALL setCBShowIntersectBonds(const void *value, void *clientData){
+    (*(Preferences *)(clientData)).showIntersectBonds = *(const bool *)value;
+    renderer.generateBuffers((*(Preferences *)(clientData)));
+}
+
+void TW_CALL setCBExtraBonds(const void *value, void *clientData){
+    (*(Preferences *)(clientData)).numberExtraBonds = *(const int *)value;
+    //recalcPS();
+    initComponents(*(Preferences *) (clientData));
+    renderer.generateBuffers((*(Preferences *)(clientData)));
+}
+
+
+//getters
+void TW_CALL getCBShowSoftBonds(void *value, void *clientData){
+    *(bool *)value = (*(Preferences *)(clientData)).showSoftBonds;
+}
+
+void TW_CALL getCBShowHardBonds(void *value, void *clientData){
+    *(bool *)value = (*(Preferences *)(clientData)).showHardBonds;
+}
+
+void TW_CALL getCBShowIntersectBonds(void *value, void *clientData){
+    *(bool *)value = (*(Preferences *)(clientData)).showIntersectBonds;
+}
+
+void TW_CALL getCBExtraBonds(void *value, void *clientData){
+    *(int *)value = (*(Preferences *)(clientData)).numberExtraBonds;
 }
 
 void initTweakBar(DynamicShape& ds){
@@ -93,7 +120,8 @@ void initTweakBar(DynamicShape& ds){
     TwDefine(" GLOBAL iconmargin='5 5' ");
     TwDefine(" GLOBAL fontsize=2 fontstyle=default contained=true buttonalign=left ");
 
-    TwAddVarRW(myBar, "Extra bonds", TW_TYPE_INT32, &ds.prefs.numberExtraBonds , " min=0 max=500000 step=100 keyIncr=z keyDecr=x help=' '");
+    //TwAddVarRW(myBar, "Extra bonds", TW_TYPE_INT32, &ds.prefs.numberExtraBonds , " min=0 max=500000 step=100 keyIncr=z keyDecr=x help=' '");
+    TwAddVarCB(myBar, "ExtraBonds", TW_TYPE_INT32, setCBExtraBonds, getCBExtraBonds, &ds.prefs, "label='Extra bonds' min=0 max=500000 step=100 keyIncr=z keyDecr=x help=' '");
 
     TwAddVarRW(myBar, "Damp", TW_TYPE_FLOAT, &ds.prefs.damp, " min=0.0 max=1.0 step=0.001 keyIncr=a keyDecr=s help=' '");
     TwAddVarRW(myBar, "Trail", TW_TYPE_FLOAT, &ds.prefs.trailing, " min=0.0 max=1.0 step=0.01 keyIncr=i keyDecr=u help=' '");
@@ -110,11 +138,15 @@ void initTweakBar(DynamicShape& ds){
 
     TwAddSeparator(myBar,"sep1",NULL);
 
-    TwAddVarRW(myBar, "ShowINTERSECT", TW_TYPE_BOOL8, &ds.prefs.showIntersectBonds, "label='Show INTERSECT' key=1 help='Show intersect bonds.' true='YES' false='NO' group=Visualization ");
-    TwAddVarRW(myBar, "ShowHARD", TW_TYPE_BOOL8, &ds.prefs.showHardBonds, "label='Show HARD' key=2 help='Show hard bonds.' true='YES' false='NO' group=Visualization ");
+    //TwAddVarRW(myBar, "ShowINTERSECT", TW_TYPE_BOOL8, &ds.prefs.showIntersectBonds, "label='Show INTERSECT' key=1 help='Show intersect bonds.' true='YES' false='NO' group=Visualization ");
+    TwAddVarCB(myBar, "ShowINTERSECT", TW_TYPE_BOOL8, setCBShowIntersectBonds, getCBShowIntersectBonds, &ds.prefs, "label='Show INTERSECT' key=1 help='Show intersect bonds.' true='YES' false='NO' group=Visualization ");
+
+    //TwAddVarRW(myBar, "ShowHARD", TW_TYPE_BOOL8, &ds.prefs.showHardBonds, "label='Show HARD' key=2 help='Show hard bonds.' true='YES' false='NO' group=Visualization ");
+    TwAddVarCB(myBar, "ShowHARD", TW_TYPE_BOOL8, setCBShowHardBonds, getCBShowHardBonds, &ds.prefs, "label='Show HARD' key=2 help='Show hard bonds.' true='YES' false='NO' group=Visualization ");
 
     //TwAddVarRW(myBar, "ShowSOFT", TW_TYPE_BOOL8, &ds.prefs.showSoftBonds, "label='Show SOFT' key=3 help='Show soft bonds.' true='YES' false='NO' group=Visualization ");
-    TwAddVarCB(myBar, "ShowSOFT", TW_TYPE_BOOL8, SetCallback, GetCallback, &ds.prefs, NULL);
+    TwAddVarCB(myBar, "ShowSOFT", TW_TYPE_BOOL8, setCBShowSoftBonds, getCBShowSoftBonds, &ds.prefs, "label='Show SOFT' key=3 help='Show soft bonds.' true='YES' false='NO' group=Visualization ");
+
     TwAddVarRW(myBar, "Showgrid", TW_TYPE_BOOL8, &ds.prefs.showGrid, "label='Show grid' key=space help='Show the grid' true='YES' false='NO' group=Visualization ");
 
     TwAddSeparator(myBar,"sep2",NULL);
