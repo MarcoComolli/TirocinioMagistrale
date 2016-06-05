@@ -130,7 +130,6 @@ void DynamicShape::doPhysicsStep(Scalar dt, const PairStatistics& ps){
     //forza = f(posNow)
     //acc = f/m
     Scalar damp = 1 - prefs.damp;
-    std::cout << "prova: " << prova << std::endl;
     Scalar speed = 0;
     qmol::Pos pNext;
     for (int i = 0; i < ps.totalUniqueAtoms; ++i) {

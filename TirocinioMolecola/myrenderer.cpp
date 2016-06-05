@@ -66,7 +66,6 @@ Matrix fromQuat( const Vec4& quat ){
 
 }
 
-
 const char* pVSFilePath = "F:/Documenti - Marco/Documenti/Universita/Tirocinio Magistrale/qt_workspace/TirocinioMolecola/shader.vs.glsl";
 const char* pFSFilePath = "F:/Documenti - Marco/Documenti/Universita/Tirocinio Magistrale/qt_workspace/TirocinioMolecola/shader.fs.glsl";
 const char* pFSNLFilePath = "F:/Documenti - Marco/Documenti/Universita/Tirocinio Magistrale/qt_workspace/TirocinioMolecola/shaderNoLight.fs";
@@ -768,49 +767,57 @@ static void uniq(vector<int> v){
     std::cout << "Unique check: "  << a.size() << " of " << v.size() <<std::endl;
 }
 
-vector<int> getBoundIndexesForRendering(Preferences p, const PairStatistics & ps){
+vector<bool> getBoundIndexesForRendering(Preferences p, const PairStatistics & ps){
     bitset<3> bits(0);
     if(p.showIntersectBonds){bits.set(0);} //001
     if(p.showHardBonds){bits.set(1);}       //010
     if(p.showSoftBonds){bits.set(2);}       //100
 
-    vector<int> result;
+    vector<bool> result;
 
 
     short s = (short)bits.to_ulong();
 
     switch (s) {
     case 0:
-        result.push_back(0); //low
-        result.push_back(0); //high
+        result.push_back(false); //intersect
+        result.push_back(false); //hard
+        result.push_back(false); //soft
         return result;
     case 1:
-        result.push_back(ps.intersectStartIdx); //low
-        result.push_back(ps.intersectEndIdx); //high
+        result.push_back(true); //intersect
+        result.push_back(false); //hard
+        result.push_back(false); //soft
         return result;
     case 2:
-        result.push_back(ps.hardStartIdx); //low
-        result.push_back(ps.hardEndIdx); //high
+        result.push_back(false); //intersect
+        result.push_back(true); //hard
+        result.push_back(false); //soft
         return result;
     case 3:
-        result.push_back(ps.intersectStartIdx); //low
-        result.push_back(ps.hardEndIdx); //high
+        result.push_back(true); //intersect
+        result.push_back(true); //hard
+        result.push_back(false); //soft
         return result;
     case 4:
-        result.push_back(ps.softStartIdx); //low
-        result.push_back(ps.softEndIdx); //high
+        result.push_back(false); //intersect
+        result.push_back(false); //hard
+        result.push_back(true); //soft
         return result;
-    case 5: //NO SINGLE INTERVAL -> TAKE ALL INSTEAD
-        result.push_back(ps.intersectStartIdx); //low
-        result.push_back(ps.softEndIdx); //high
+    case 5:
+        result.push_back(true); //intersect
+        result.push_back(false); //hard
+        result.push_back(true); //soft
         return result;
     case 6:
-        result.push_back(ps.hardStartIdx); //low
-        result.push_back(ps.softEndIdx); //high
+        result.push_back(false); //intersect
+        result.push_back(true); //hard
+        result.push_back(true); //soft
         return result;
     case 7:
-        result.push_back(ps.intersectStartIdx); //low
-        result.push_back(ps.softEndIdx); //high
+        result.push_back(true); //intersect
+        result.push_back(true); //hard
+        result.push_back(true); //soft
         return result;
     default:
         return result;
@@ -825,8 +832,8 @@ void MyRenderer::generateBuffers(Preferences prefs){
     vector<vec3> cubes;
     vector<vec3> lines;
     vector<BoundType> bounds;
-    vector<Scalar> variances;
-    vector<Scalar> variancesNorm;
+ //   vector<Scalar> variances;
+ //   vector<Scalar> variancesNorm;
     vector<bool> renderCentersSelector(ds.ball.size());
 
     std::cout << "size ball " << ds.ball.size() << std::endl;
@@ -844,40 +851,116 @@ void MyRenderer::generateBuffers(Preferences prefs){
     int c1 = 0, c2 = 0;
     int a1,a2;
     DynamicBall b1,b2;
-    int lowIndex = getBoundIndexesForRendering(prefs,ps)[0];
-    int highIndex = getBoundIndexesForRendering(prefs,ps)[1];
+    vector<bool> showBonds = getBoundIndexesForRendering(prefs,ps);
 
+    if (showBonds[0]) {
+        for (int i = ps.intersectStartIdx; i <= ps.intersectEndIdx; ++i) {
+            a1 =  ps.pairs[i].atomID1;
+            a2 =  ps.pairs[i].atomID2;
+            b1 = ds.ball.at(a1);
+            b2 = ds.ball.at(a2);
+            v1 = vec3(b1.currPos.X(), b1.currPos.Y(), b1.currPos.Z());
+            v2 = vec3(b2.currPos.X(), b2.currPos.Y(), b2.currPos.Z());
 
-
-    std::cout << "Indexes " << lowIndex << " " << highIndex << std::endl;
-
-
-
-    for (int i = lowIndex; i <= highIndex; ++i) {
-        a1 =  ps.pairs[i].atomID1;
-        a2 =  ps.pairs[i].atomID2;
-        b1 = ds.ball.at(a1);
-        b2 = ds.ball.at(a2);
-        v1 = vec3(b1.currPos.X(), b1.currPos.Y(), b1.currPos.Z());
-        v2 = vec3(b2.currPos.X(), b2.currPos.Y(), b2.currPos.Z());
-
-        variances.push_back(ps.pairs[i].variance);
-       // std::cout << "var: " << ps.pairs[i].variance << std::endl;
-        if(renderCentersSelector.at(a1) == false){
-            renderCentersSelector.at(a1) = true;
-            centers.push_back(v1);
-            c1++;
+            //variances.push_back(ps.pairs[i].variance);
+           // std::cout << "var: " << ps.pairs[i].variance << std::endl;
+            if(renderCentersSelector.at(a1) == false){
+                renderCentersSelector.at(a1) = true;
+                centers.push_back(v1);
+                c1++;
+            }
+            if(renderCentersSelector.at(a2) == false){
+                renderCentersSelector.at(a2) = true;
+                centers.push_back(v2);
+                c2++;
+            }
+            lines.push_back(v1);
+            lines.push_back(v2);
+            bounds.push_back(ps.pairs[i].constr);
         }
-        if(renderCentersSelector.at(a2) == false){
-            renderCentersSelector.at(a2) = true;
-            centers.push_back(v2);
-            c2++;
-        }
-        lines.push_back(v1);
-        lines.push_back(v2);
-        bounds.push_back(ps.pairs[i].constr);
-
     }
+
+    if (showBonds[1]) {
+        for (int i = ps.hardStartIdx; i <= ps.hardEndIdx; ++i) {
+            a1 =  ps.pairs[i].atomID1;
+            a2 =  ps.pairs[i].atomID2;
+            b1 = ds.ball.at(a1);
+            b2 = ds.ball.at(a2);
+            v1 = vec3(b1.currPos.X(), b1.currPos.Y(), b1.currPos.Z());
+            v2 = vec3(b2.currPos.X(), b2.currPos.Y(), b2.currPos.Z());
+
+            //variances.push_back(ps.pairs[i].variance);
+           // std::cout << "var: " << ps.pairs[i].variance << std::endl;
+            if(renderCentersSelector.at(a1) == false){
+                renderCentersSelector.at(a1) = true;
+                centers.push_back(v1);
+                c1++;
+            }
+            if(renderCentersSelector.at(a2) == false){
+                renderCentersSelector.at(a2) = true;
+                centers.push_back(v2);
+                c2++;
+            }
+            lines.push_back(v1);
+            lines.push_back(v2);
+            bounds.push_back(ps.pairs[i].constr);
+        }
+    }
+
+    if (showBonds[2]) {
+        for (int i = ps.softStartIdx; i <= ps.softEndIdx; ++i) {
+            a1 =  ps.pairs[i].atomID1;
+            a2 =  ps.pairs[i].atomID2;
+            b1 = ds.ball.at(a1);
+            b2 = ds.ball.at(a2);
+            v1 = vec3(b1.currPos.X(), b1.currPos.Y(), b1.currPos.Z());
+            v2 = vec3(b2.currPos.X(), b2.currPos.Y(), b2.currPos.Z());
+
+            //variances.push_back(ps.pairs[i].variance);
+           // std::cout << "var: " << ps.pairs[i].variance << std::endl;
+            if(renderCentersSelector.at(a1) == false){
+                renderCentersSelector.at(a1) = true;
+                centers.push_back(v1);
+                c1++;
+            }
+            if(renderCentersSelector.at(a2) == false){
+                renderCentersSelector.at(a2) = true;
+                centers.push_back(v2);
+                c2++;
+            }
+            lines.push_back(v1);
+            lines.push_back(v2);
+            bounds.push_back(ps.pairs[i].constr);
+        }
+    }
+
+
+
+//    for (int i = ps.intersectStartIdx; i <= ps.intersectEndIdx; ++i) {
+//        a1 =  ps.pairs[i].atomID1;
+//        a2 =  ps.pairs[i].atomID2;
+//        b1 = ds.ball.at(a1);
+//        b2 = ds.ball.at(a2);
+//        v1 = vec3(b1.currPos.X(), b1.currPos.Y(), b1.currPos.Z());
+//        v2 = vec3(b2.currPos.X(), b2.currPos.Y(), b2.currPos.Z());
+
+//       // variances.push_back(ps.pairs[i].variance);
+//       // std::cout << "var: " << ps.pairs[i].variance << std::endl;
+//        if(renderCentersSelector.at(a1) == false){
+//            renderCentersSelector.at(a1) = true;
+//            centers.push_back(v1);
+//            c1++;
+//        }
+//        if(renderCentersSelector.at(a2) == false){
+//            renderCentersSelector.at(a2) = true;
+//            centers.push_back(v2);
+//            c2++;
+//        }
+//        lines.push_back(v1);
+//        lines.push_back(v2);
+//        bounds.push_back(ps.pairs[i].constr);
+
+//    }
 
 
 
@@ -890,7 +973,7 @@ void MyRenderer::generateBuffers(Preferences prefs){
     std::cout << "nelements: " <<nElements << std::endl;
 
     centersNormalized = centers;//normalizeCenters(centers, radius);
-    variancesNorm = normalizedVariances(variances);
+    //variancesNorm = normalizedVariances(variances);
 
     vector<vec3> temp;
 
@@ -901,15 +984,15 @@ void MyRenderer::generateBuffers(Preferences prefs){
 
 
 
-    for (uint i = 0; i < centersNormalized.size(); ++i) {
-        temp = generateCube(centersNormalized[i].x,centersNormalized[i].y,centersNormalized[i].z,radius);
-        cubes.insert(cubes.end(),temp.begin(), temp.end());
-    }
+//    for (uint i = 0; i < centersNormalized.size(); ++i) {
+//        temp = generateCube(centersNormalized[i].x,centersNormalized[i].y,centersNormalized[i].z,radius);
+//        cubes.insert(cubes.end(),temp.begin(), temp.end());
+//    }
 
 
-    colors = generateColors(cubes);
+//    colors = generateColors(cubes);
     colorLines = generateColorsLines(bounds);
-    normals = generateCubeNormals(cubes);
+//    normals = generateCubeNormals(cubes);
     grid = generateGrid(this->grid);
 
     nGrid = grid.size();
@@ -919,9 +1002,9 @@ void MyRenderer::generateBuffers(Preferences prefs){
 //        std::cout << "cubo " << i << ": " << cubes.at(i).x << " " << cubes.at(i).y << " " << cubes.at(i).z << std::endl;
 //    }
 
-    generateVBO(&VBO,cubes);
-    generateVBO(&VBOColor,colors);
-    generateVBO(&VBONormals,normals);
+//    generateVBO(&VBO,cubes);
+//    generateVBO(&VBOColor,colors);
+//    generateVBO(&VBONormals,normals);
     generateVBO(&VBOLines,lines);
     generateVBO(&VBOColorLines,colorLines);
     generateVBO(&VBOGrid,grid);
@@ -960,42 +1043,115 @@ void MyRenderer::updateBuffers(PairStatistics ps){
 
     int a1,a2;
     DynamicBall b1,b2;
-    int lowIndex = getBoundIndexesForRendering(ds.prefs,ps)[0];
-    int highIndex = getBoundIndexesForRendering(ds.prefs,ps)[1];
 
 
-    for (int i = lowIndex; i <= highIndex; ++i) { //solo per gli intersect
-        a1 =  ps.pairs[i].atomID1;
-        a2 =  ps.pairs[i].atomID2;
-        b1 = ds.ball.at(a1);
-        b2 = ds.ball.at(a2);
-        v1 = vec3(b1.currPos.X(), b1.currPos.Y(), b1.currPos.Z());
-        v2 = vec3(b2.currPos.X(), b2.currPos.Y(), b2.currPos.Z());
+    vector<bool> showBonds = getBoundIndexesForRendering(ds.prefs,ps);
 
-        variances.push_back(ps.pairs[i].variance);
-        //va cambiato come nel generate buffers solo per test ora
-        if(renderCentersSelector.at(a1) == false){
-            renderCentersSelector.at(a1) = true;
-            centers.push_back(v1);
+    if (showBonds[0]) {
+        for (int i = ps.intersectStartIdx; i <= ps.intersectEndIdx; ++i) {
+            a1 =  ps.pairs[i].atomID1;
+            a2 =  ps.pairs[i].atomID2;
+            b1 = ds.ball.at(a1);
+            b2 = ds.ball.at(a2);
+            v1 = vec3(b1.currPos.X(), b1.currPos.Y(), b1.currPos.Z());
+            v2 = vec3(b2.currPos.X(), b2.currPos.Y(), b2.currPos.Z());
+
+            if(renderCentersSelector.at(a1) == false){
+                renderCentersSelector.at(a1) = true;
+                centers.push_back(v1);
+            }
+            if(renderCentersSelector.at(a2) == false){
+                renderCentersSelector.at(a2) = true;
+                centers.push_back(v2);
+            }
+            lines.push_back(v1);
+            lines.push_back(v2);
+            bounds.push_back(ps.pairs[i].constr);
         }
-        if(renderCentersSelector.at(a2) == false){
-            renderCentersSelector.at(a2) = true;
-            centers.push_back(v2);
-        }
-
-        lines.push_back(v1);
-        lines.push_back(v2);
-        bounds.push_back(ps.pairs[i].constr);
-
-
     }
+
+    if (showBonds[1]) {
+        for (int i = ps.hardStartIdx; i <= ps.hardEndIdx; ++i) {
+            a1 =  ps.pairs[i].atomID1;
+            a2 =  ps.pairs[i].atomID2;
+            b1 = ds.ball.at(a1);
+            b2 = ds.ball.at(a2);
+            v1 = vec3(b1.currPos.X(), b1.currPos.Y(), b1.currPos.Z());
+            v2 = vec3(b2.currPos.X(), b2.currPos.Y(), b2.currPos.Z());
+
+            if(renderCentersSelector.at(a1) == false){
+                renderCentersSelector.at(a1) = true;
+                centers.push_back(v1);
+            }
+            if(renderCentersSelector.at(a2) == false){
+                renderCentersSelector.at(a2) = true;
+                centers.push_back(v2);
+            }
+            lines.push_back(v1);
+            lines.push_back(v2);
+            bounds.push_back(ps.pairs[i].constr);
+        }
+    }
+
+    if (showBonds[2]) {
+        for (int i = ps.softStartIdx; i <= ps.softEndIdx; ++i) {
+            a1 =  ps.pairs[i].atomID1;
+            a2 =  ps.pairs[i].atomID2;
+            b1 = ds.ball.at(a1);
+            b2 = ds.ball.at(a2);
+            v1 = vec3(b1.currPos.X(), b1.currPos.Y(), b1.currPos.Z());
+            v2 = vec3(b2.currPos.X(), b2.currPos.Y(), b2.currPos.Z());
+
+            if(renderCentersSelector.at(a1) == false){
+                renderCentersSelector.at(a1) = true;
+                centers.push_back(v1);
+            }
+            if(renderCentersSelector.at(a2) == false){
+                renderCentersSelector.at(a2) = true;
+                centers.push_back(v2);
+            }
+            lines.push_back(v1);
+            lines.push_back(v2);
+            bounds.push_back(ps.pairs[i].constr);
+        }
+    }
+
+
+
+//    int lowIndex = getBoundIndexesForRendering(ds.prefs,ps)[0];
+//    int highIndex = getBoundIndexesForRendering(ds.prefs,ps)[1];
+//    for (int i = ps.intersectStartIdx; i <= ps.intersectEndIdx; ++i) {
+//        a1 =  ps.pairs[i].atomID1;
+//        a2 =  ps.pairs[i].atomID2;
+//        b1 = ds.ball.at(a1);
+//        b2 = ds.ball.at(a2);
+//        v1 = vec3(b1.currPos.X(), b1.currPos.Y(), b1.currPos.Z());
+//        v2 = vec3(b2.currPos.X(), b2.currPos.Y(), b2.currPos.Z());
+
+//       // variances.push_back(ps.pairs[i].variance);
+//        //va cambiato come nel generate buffers solo per test ora
+//        if(renderCentersSelector.at(a1) == false){
+//            renderCentersSelector.at(a1) = true;
+//            centers.push_back(v1);
+//        }
+//        if(renderCentersSelector.at(a2) == false){
+//            renderCentersSelector.at(a2) = true;
+//            centers.push_back(v2);
+//        }
+
+//        lines.push_back(v1);
+//        lines.push_back(v2);
+//        bounds.push_back(ps.pairs[i].constr);
+
+
+//    }
 
 
     nElements = centers.size();
 
      nLines = lines.size();
 
-    variancesNorm = normalizedVariances(variances);
+    //variancesNorm = normalizedVariances(variances);
 
     vector<vec3> temp;
     vector<vec3> colors;
