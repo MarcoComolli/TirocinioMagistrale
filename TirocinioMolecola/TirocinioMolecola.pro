@@ -31,6 +31,9 @@ LIBS += -L$$ANTTWEAKBAR_PATH/lib -lAntTweakBar
 SOURCES += qutemolLib\atomTable.cpp \
     qutemolLib\molecule.cpp \
     qutemolLib\shape.cpp \
+    qutemolLib\settings.cpp \
+    qutemolLib\glProgram.cpp \
+    qutemolLib\glSurface.cpp \
     atompair.cpp \
     pairstatistics.cpp \
     myrenderer.cpp \
@@ -38,10 +41,8 @@ SOURCES += qutemolLib\atomTable.cpp \
     dynamicshape.cpp \
     spatialgrid.cpp \
     main_glut.cpp \
-    common_stuff.cpp
-
-
-
+    common_stuff.cpp \
+    quterenderer.cpp
 
 
 
@@ -52,12 +53,16 @@ HEADERS += \
     qutemolLib\shape.h \
     qutemolLib\basetypes.h \
     qutemolLib\shapingOptions.h \
+    qutemolLib\settings.h \
+    qutemolLib\glProgram.h \
+    qutemolLib\glSurface.h \
     atompair.h \
     myrenderer.h \
     ../../../../../../Programmazione/librerie_tesi_cpp/cg_tut/ogldev_pipeline.h \
     dynamicshape.h \
     spatialgrid.h \
-    preferences.h
+    preferences.h \
+    quterenderer.h
 
 
 
@@ -73,7 +78,8 @@ DEFINES += GLEW_STATIC
 SOURCES += $$GLEW_PATH/src/glew.c \
 
 DISTFILES += \
-    shaderNoLight.fs
+    ballFinal.frag.glsl \
+    ballFinal.vert.glsl
 
 
 
