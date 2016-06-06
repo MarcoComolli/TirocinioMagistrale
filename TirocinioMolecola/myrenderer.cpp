@@ -68,7 +68,6 @@ Matrix fromQuat( const Vec4& quat ){
 
 const char* pVSFilePath = "F:/Documenti - Marco/Documenti/Universita/Tirocinio Magistrale/qt_workspace/TirocinioMolecola/shader.vs.glsl";
 const char* pFSFilePath = "F:/Documenti - Marco/Documenti/Universita/Tirocinio Magistrale/qt_workspace/TirocinioMolecola/shader.fs.glsl";
-const char* pFSNLFilePath = "F:/Documenti - Marco/Documenti/Universita/Tirocinio Magistrale/qt_workspace/TirocinioMolecola/shaderNoLight.fs";
 
 //testing
 
@@ -84,7 +83,7 @@ GLuint lineColor;
 
 
 GLuint shaderProg;
-GLuint shaderNoLightProg;
+
 
 
 
@@ -224,9 +223,8 @@ static void CompileShaders(){
 
 
     GLuint shaderProgram = glCreateProgram();
-    GLuint shaderNoLightProgram = glCreateProgram();
 
-    if (shaderProgram == 0 || shaderNoLightProgram == 0) {
+    if (shaderProgram == 0) {
         fprintf(stderr, "Error creating shader program\n");
         exit(1);
     }
@@ -259,28 +257,16 @@ static void CompileShaders(){
 
     inFile.close();
 
-    inFile.open(pFSNLFilePath);//open the input file
-
-    if ( (inFile.rdstate() & std::ifstream::failbit ) != 0 )
-        std::cerr << "Error opening file3\n";
-
-
-    strStream.str("");
-    strStream << inFile.rdbuf();//read the file
-    string fsnl = strStream.str();//str holds the content of the file
-
-    inFile.close();
 
 
     AddShader(shaderProgram, vs.c_str(), GL_VERTEX_SHADER);
     AddShader(shaderProgram, fs.c_str(), GL_FRAGMENT_SHADER);
-    AddShader(shaderNoLightProgram, fsnl.c_str(), GL_FRAGMENT_SHADER);
 
     GLint success = 0;
     GLchar ErrorLog[1024] = { 0 };
 
     glLinkProgram(shaderProgram);
-    glLinkProgram(shaderNoLightProgram);
+
 
 
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
@@ -290,12 +276,8 @@ static void CompileShaders(){
         exit(1);
     }
 
-    glGetProgramiv(shaderNoLightProgram, GL_LINK_STATUS, &success);
-    if (success == 0) {
-        glGetProgramInfoLog(shaderNoLightProgram, sizeof(ErrorLog), NULL, ErrorLog);
-        fprintf(stderr, "Error linking shader program2: '%s'\n", ErrorLog);
-        exit(1);
-    }
+
+
 
 
     glValidateProgram(shaderProgram);
@@ -303,14 +285,6 @@ static void CompileShaders(){
     if (!success) {
         glGetProgramInfoLog(shaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
         fprintf(stderr, "Invalid shader program3: '%s'\n", ErrorLog);
-        exit(1);
-    }
-
-    glValidateProgram(shaderNoLightProgram);
-    glGetProgramiv(shaderNoLightProgram, GL_VALIDATE_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderNoLightProgram, sizeof(ErrorLog), NULL, ErrorLog);
-        fprintf(stderr, "Invalid shader program: '%s'\n", ErrorLog);
         exit(1);
     }
 
@@ -339,7 +313,6 @@ static void CompileShaders(){
     //assert(lineColor != 0xFFFFFFFF);
 
     shaderProg = shaderProgram;
-    shaderNoLightProg = shaderNoLightProgram;
 }
 
 static vec3 cross(vec3 v1, vec3 v2){
