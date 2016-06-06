@@ -48,6 +48,7 @@ public:
     void setShadowMapSize(int i);
 
 
+
     /* rendering settings */
     /* ****************** */
 
