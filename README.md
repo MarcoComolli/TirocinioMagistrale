@@ -10,6 +10,6 @@ Dynamic molecule qutemol
 - [x] glBlendFunc (alpha blending commutativa GL_ONE GL_ONE)
 - [x] visualizzare su anttweak numero vincoli x tipo
 - [x] debuggare un po' anttweakbar
-- [?] assicurarsi che il rendering avvenga solo dopo aver effettuato le modifiche
-- [?] esperimento della molecola (stesso fotogramma passato più volte per vedere se la molecola rigida)
+- [x] assicurarsi che il rendering avvenga solo dopo aver effettuato le modifiche 
+- [x] esperimento della molecola (stesso fotogramma passato più volte per vedere se la molecola rigida)
 - [ ] renderer alla qutemol
