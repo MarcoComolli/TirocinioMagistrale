@@ -20,7 +20,7 @@ public:
     qmol::Scalar damp = 0.160;
     qmol::Scalar trailing = 1.0;
     qmol::Scalar trailThres = 2.0;
-    qmol::Scalar minVarianceTrhesh = 0.99;//0.2;
+    qmol::Scalar minVarianceTrhesh = 0.9;//0.2;
     qmol::Scalar maxVarianceTrhesh = 1.0;//4.0;
 
     qmol::Scalar R = 20;

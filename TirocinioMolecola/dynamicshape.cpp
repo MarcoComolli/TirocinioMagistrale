@@ -55,15 +55,19 @@ void DynamicShape::applySprings(const PairStatistics& ps, Scalar dt){
     //2)lunghezza(PosAtomoAttuale-PosAtomoDellaCoppia) - distanza media
     //3)vettore(PosAtomoAttuale-PosAtomoDellaCoppia)/lunghezza(PosAtomoAttuale-PosAtomoDellaCoppia)
 
-    for (unsigned int i = ps.softStartIdx; i <=  ps.softEndIdx ; ++i) {
+
+    for (int i = ps.softStartIdx; i <=  ps.softEndIdx ; ++i) {
             qmol::Vec force = calculateSpringForce(ps.pairs[i].kSpring,
                                                    ps.pairs.at(i).distance,
                                                    ps.pairs.at(i).atomID1,
                                                    ps.pairs.at(i).atomID2
                                                    );
 
+
+
+            //std::cout << "Force: " << printPos(force) << std::endl;
             force *= dt*dt;
-            //std::cout << "force: " << force.X() << "," << force.Y() << "," << force.Z() << std::endl;
+
 
 
             ball.at(ps.pairs.at(i).atomID1).currPos += force; //current pos è ora a currentpos + forza (nel dt)
@@ -165,12 +169,22 @@ void DynamicShape::doPhysicsStep(Scalar dt, const PairStatistics& ps){
 //the force of the spring and return it
 qmol::Vec DynamicShape::calculateSpringForce(Scalar k, Scalar springLength, int atomID, int atomIDPaired){
 
+
     qmol::Pos a1Pos = ball.at(atomID).currPos;
     qmol::Pos a2Pos = ball.at(atomIDPaired).currPos;
 
+//     std::cout << "a1 POS: " << printPos(a1Pos) << std::endl;
+//     std::cout << "a2 POS: " << printPos(a2Pos) << std::endl;
+
+     if(isnan(a1Pos.X())){
+         std::cout << "is nan" << std::endl;
+     }
+
     Scalar actualLength = qmol::distance(a1Pos,a2Pos);
 
+
     Scalar factor = (springLength-actualLength)/actualLength; //così facendo: pos in compressione, neg in allungamento
+
 
     if(actualLength < 0.001){
         if(springLength < 0.001)
@@ -179,6 +193,7 @@ qmol::Vec DynamicShape::calculateSpringForce(Scalar k, Scalar springLength, int 
             factor = 1;
     }
     qmol::Vec dir(a1Pos - a2Pos);
+
 
     return dir*(k*factor);
 
@@ -269,6 +284,10 @@ bool DynamicShape::checkIntersect(int atomID1, int atomID2){
 
 
 Scalar calculateSpringK(Scalar variance){
+    if(variance < 0.01){
+        std::cout << "ERRORE VARIANZA = 0 PER MOLLA" << std::endl;
+        return 1000;
+    }
     return 10.0f/variance;
 }
 
@@ -305,17 +324,11 @@ void DynamicShape::calculatePSBonds(PairStatistics& ps){
         ps.pairs.erase(ps.pairs.begin() + toRemove[i] - i);
     }
 
-    std::cout << "Intersect: "  << cInt << std::endl;
-    std::cout << "Removed: "  << cRem << std::endl;
-    std::cout << "Soft: "  << cSoft << std::endl;
-    std::cout << "Hard: "  << cHard << std::endl;
 
     prefs.intersectCnt = cInt;
     prefs.removedCnt = cRem;
     prefs.softCnt = cSoft;
     prefs.hardCnt = cHard;
-
-    std::cout << "AGGIORNO IL REMOVEEEEEED "  << prefs.removedCnt<< std::endl;
 
     ps.orderPairsByBound();
 }

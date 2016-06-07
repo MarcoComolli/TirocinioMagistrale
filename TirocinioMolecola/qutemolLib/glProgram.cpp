@@ -502,6 +502,9 @@ std::string glProgram::read_text_file(const char * file_name)
 
     std::string r;
 
+    std::cout << "file name " << file_name << std::endl;
+
+
     ::FILE * f = fopen(file_name, "rb");
     assert( f!=0 && "File Not Found");
 

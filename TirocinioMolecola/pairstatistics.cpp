@@ -139,16 +139,16 @@ bool compareAPByBound(AtomPair a,AtomPair b) {
 }
 
 void PairStatistics::orderPairsByBound(){
-
-
     sort(pairs.begin(), pairs.end(), compareAPByBound);
 
+
+
     for (int i = 0; i < pairs.size(); ++i) {
-        if(i != i < pairs.size() -1){
+        if(i != pairs.size() -1){
             if((int)pairs[i].constr < (int)pairs[i+1].constr){
-                std::cout << i-1 << " -> " << (int)pairs[i-1].constr << std::endl;
-                std::cout << i << " -> " << (int)pairs[i].constr << std::endl;
-                std::cout << i+1 << " -> " << (int)pairs[i+1].constr << std::endl << std::endl;
+//                std::cout << i-1 << " -> " << (int)pairs[i-1].constr << std::endl;
+//                std::cout << i << " -> " << (int)pairs[i].constr << std::endl;
+//                std::cout << i+1 << " -> " << (int)pairs[i+1].constr << std::endl << std::endl;
                 if(pairs[i].constr == BoundType::INTERSECT){
                     intersectEndIdx = i;
                     hardStartIdx = i+1;
@@ -160,14 +160,21 @@ void PairStatistics::orderPairsByBound(){
             }
         }
     }
-    intersectStartIdx = 0;
-    softEndIdx = pairs.size() -1;
+    if(pairs[pairs.size()-1].constr == BoundType::SOFT){
+        softEndIdx = pairs.size() -1;
+    }
+    if(pairs[pairs.size()-1].constr == BoundType::HARD){
+        hardEndIdx = pairs.size() -1;
+    }
+    if(pairs[pairs.size()-1].constr == BoundType::INTERSECT){
+        intersectEndIdx = pairs.size() -1;
+    }
 
-    std::cout << "int start " << intersectStartIdx << std::endl;
-    std::cout << "int end " << intersectEndIdx << std::endl;
-    std::cout << "hard start " << hardStartIdx << std::endl;
-    std::cout << "hard end " << hardEndIdx << std::endl;
-    std::cout << "soft start " << softStartIdx << std::endl;
-    std::cout << "soft end " << softEndIdx << std::endl;
+    std::cout << "intersect start idx: " << intersectStartIdx << std::endl;
+    std::cout << "intersect end idx: " << intersectEndIdx << std::endl;
+    std::cout << "hard start idx: " << hardStartIdx << std::endl;
+    std::cout << "hard end idx: " << hardEndIdx << std::endl;
+    std::cout << "soft start idx: " << softStartIdx << std::endl;
+    std::cout << "soft end idx: " << softEndIdx << std::endl;
 
 }

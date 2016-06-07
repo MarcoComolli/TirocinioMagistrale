@@ -179,9 +179,7 @@ static void updateVBO(GLuint* buffer, vector<vec3> data){
 
 static void generateVBO(GLuint* buffer,vector<vec3> data){
 
-    std::cout << buffer << " VBO size of: " << sizeof(vec3)*data.capacity() << std::endl;
-
-    //genera buffer
+     //genera buffer
     glGenBuffers(1, buffer);  //#1, numero di oggetti da creare
     glBindBuffer(GL_ARRAY_BUFFER, *buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*data.size(), &data[0], GL_STATIC_DRAW);
@@ -450,6 +448,12 @@ void MyRenderer::init(){
     glDepthFunc(GL_LESS);
 
 
+    //glBlendFunc(GL_ZERO, GL_SRC_COLOR);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glEnable(GL_BLEND);
+
+
+
 }
 
 qmol::Matrix 	perspective(
@@ -541,8 +545,6 @@ void MyRenderer::printCubes(){
 
 void MyRenderer::render(){
 
-
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(shaderProg);
@@ -588,14 +590,12 @@ void MyRenderer::render(){
     glUniform3f(lightID, lightPos.x, lightPos.y, lightPos.z);
 
     //printCubes();
-
     //printLines();
 
     if(ds.prefs.showGrid){
         printGrid();
     }
 
-    TwDraw();
 
 }
 
@@ -804,7 +804,7 @@ vector<bool> getBoundIndexesForRendering(Preferences p, const PairStatistics & p
 
 void MyRenderer::generateBuffers(Preferences prefs){
 
-    std::cout << "--INIZIO--" << std::endl;
+    std::cout << "--INIZIO GENERATE--" << std::endl;
     vector<vec3> centers;
     vector<vec3> centersNormalized;
     vector<vec3> cubes;
@@ -917,42 +917,9 @@ void MyRenderer::generateBuffers(Preferences prefs){
     }
 
 
-
-//    for (int i = ps.intersectStartIdx; i <= ps.intersectEndIdx; ++i) {
-//        a1 =  ps.pairs[i].atomID1;
-//        a2 =  ps.pairs[i].atomID2;
-//        b1 = ds.ball.at(a1);
-//        b2 = ds.ball.at(a2);
-//        v1 = vec3(b1.currPos.X(), b1.currPos.Y(), b1.currPos.Z());
-//        v2 = vec3(b2.currPos.X(), b2.currPos.Y(), b2.currPos.Z());
-
-//       // variances.push_back(ps.pairs[i].variance);
-//       // std::cout << "var: " << ps.pairs[i].variance << std::endl;
-//        if(renderCentersSelector.at(a1) == false){
-//            renderCentersSelector.at(a1) = true;
-//            centers.push_back(v1);
-//            c1++;
-//        }
-//        if(renderCentersSelector.at(a2) == false){
-//            renderCentersSelector.at(a2) = true;
-//            centers.push_back(v2);
-//            c2++;
-//        }
-//        lines.push_back(v1);
-//        lines.push_back(v2);
-//        bounds.push_back(ps.pairs[i].constr);
-
-//    }
-
-
-
-    std::cout << "c1: " << c1 << " c2: " << c2<< std::endl;
-
     nElements = centers.size();
     nLines = lines.size();
 
-
-    std::cout << "nelements: " <<nElements << std::endl;
 
     centersNormalized = centers;//normalizeCenters(centers, radius);
     //variancesNorm = normalizedVariances(variances);
@@ -991,9 +958,7 @@ void MyRenderer::generateBuffers(Preferences prefs){
     generateVBO(&VBOColorLines,colorLines);
     generateVBO(&VBOGrid,grid);
 
-    std::cout << "ngrid " << nGrid << std::endl;
-
-    std::cout << "FINE" << std::endl;
+std::cout << "--FINE GENERATE--" << std::endl;
 
 }
 
@@ -1031,7 +996,7 @@ void MyRenderer::updateBuffers(PairStatistics ps){
 
 
 
-    glUniform3f(lineColor,1.0,1.0,1.0);
+    glUniform3f(lineColor,0.6,0.6,0.6);
     if (showBonds[0]) {
         for (int i = ps.intersectStartIdx; i <= ps.intersectEndIdx; ++i) {
             a1 =  ps.pairs[i].atomID1;
@@ -1060,7 +1025,7 @@ void MyRenderer::updateBuffers(PairStatistics ps){
         }
     }
 
-    glUniform3f(lineColor,0.0,1.0,0.0);
+    glUniform3f(lineColor,0.0,6.0,0.0);
     if (showBonds[1]) {
         for (int i = ps.hardStartIdx; i <= ps.hardEndIdx; ++i) {
             a1 =  ps.pairs[i].atomID1;
@@ -1089,7 +1054,7 @@ void MyRenderer::updateBuffers(PairStatistics ps){
         }
     }
 
-    glUniform3f(lineColor,1.0,0.0,1.0);
+    glUniform3f(lineColor,0.6,0.0,0.6);
     if (showBonds[2]) {
         for (int i = ps.softStartIdx; i <= ps.softEndIdx; ++i) {
             a1 =  ps.pairs[i].atomID1;
@@ -1116,37 +1081,6 @@ void MyRenderer::updateBuffers(PairStatistics ps){
             glEnd();
         }
     }
-
-
-
-//    int lowIndex = getBoundIndexesForRendering(ds.prefs,ps)[0];
-//    int highIndex = getBoundIndexesForRendering(ds.prefs,ps)[1];
-//    for (int i = ps.intersectStartIdx; i <= ps.intersectEndIdx; ++i) {
-//        a1 =  ps.pairs[i].atomID1;
-//        a2 =  ps.pairs[i].atomID2;
-//        b1 = ds.ball.at(a1);
-//        b2 = ds.ball.at(a2);
-//        v1 = vec3(b1.currPos.X(), b1.currPos.Y(), b1.currPos.Z());
-//        v2 = vec3(b2.currPos.X(), b2.currPos.Y(), b2.currPos.Z());
-
-//       // variances.push_back(ps.pairs[i].variance);
-//        //va cambiato come nel generate buffers solo per test ora
-//        if(renderCentersSelector.at(a1) == false){
-//            renderCentersSelector.at(a1) = true;
-//            centers.push_back(v1);
-//        }
-//        if(renderCentersSelector.at(a2) == false){
-//            renderCentersSelector.at(a2) = true;
-//            centers.push_back(v2);
-//        }
-
-//        lines.push_back(v1);
-//        lines.push_back(v2);
-//        bounds.push_back(ps.pairs[i].constr);
-
-
-//    }
-
 
     nElements = centers.size();
 

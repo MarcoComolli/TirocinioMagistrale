@@ -146,20 +146,11 @@ void initComponents(Preferences& prefs){
     ps.printStats();
 
     ps.updateDistancesFromShape(shapes[0]);
+
+
 }
 
-void recalcPS(){
-    PairStatistics& ps (renderer.ps);
-    SpatialGrid &gr(renderer.grid);
-    DynamicShape& ds (renderer.ds);
 
-    initGrid(ds,gr);
-
-    ps = gr.generatePairStatistcs(ds,3.4,ds.prefs.numberExtraBonds);
-
-    //ps.calculateStats();
-    //ds.calculatePSBonds(ps);
-}
 
 static int xStored = 0;
 static int yStored = 0;

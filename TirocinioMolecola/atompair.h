@@ -53,7 +53,7 @@ public:
     int nShapes = 0;
     int intersectStartIdx = 0, intersectEndIdx = 0;
     int hardStartIdx = 0, hardEndIdx = 0;
-    int softStartIdx = 0, softEndIdx = 0;
+    int softStartIdx = 0, softEndIdx = -1;
     int totalUniqueAtoms;
 
     void populateRandom(int nPairs, int totalAtoms, qmol::Scalar increase);

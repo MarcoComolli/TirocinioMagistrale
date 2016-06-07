@@ -10,6 +10,7 @@
 #include <myrenderer.h>
 #include <AntTweakBar.h>
 #include <preferences.h>
+#include <quterenderer.h>
 
 
 #include <GL/glut.h>
@@ -18,12 +19,13 @@
 #define WINDOW_HEIGHT 691
 
 extern MyRenderer renderer;
+QuteRenderer quteRenderer(renderer.ds);
 void processKey(unsigned char);
 void processMouse(int,int,int,int,int);
 void setSpecKeyStatus(int);
 void initComponents(Preferences& prefs);
 void mouseMotion(int x, int y);
-void recalcPS();
+
 
 
 void idleCallback(){
@@ -31,8 +33,11 @@ void idleCallback(){
     glutPostRedisplay();
 }
 
+
 void displayCallback(){
     renderer.render();
+    //quteRenderer.glDrawDirect();
+    TwDraw();
     glutSwapBuffers();
 }
 
@@ -89,6 +94,16 @@ void TW_CALL setCBExtraBonds(const void *value, void *clientData){
     initComponents(*(Preferences *) (clientData));
     renderer.generateBuffers((*(Preferences *)(clientData)));
 }
+void TW_CALL setCBMaxVar(const void *value, void *clientData){
+    (*(Preferences *)(clientData)).maxVarianceTrhesh = *(const float *)value;
+    initComponents(*(Preferences *) (clientData));
+    renderer.generateBuffers((*(Preferences *)(clientData)));
+}
+void TW_CALL setCBMinVar(const void *value, void *clientData){
+    (*(Preferences *)(clientData)).minVarianceTrhesh = *(const float *)value;
+    initComponents(*(Preferences *) (clientData));
+    renderer.generateBuffers((*(Preferences *)(clientData)));
+}
 
 
 //getters
@@ -106,6 +121,14 @@ void TW_CALL getCBShowIntersectBonds(void *value, void *clientData){
 
 void TW_CALL getCBExtraBonds(void *value, void *clientData){
     *(int *)value = (*(Preferences *)(clientData)).numberExtraBonds;
+}
+
+void TW_CALL getCBMaxVar(void *value, void *clientData){
+    *(float *)value = (*(Preferences *)(clientData)).maxVarianceTrhesh;
+}
+
+void TW_CALL getCBMinVar(void *value, void *clientData){
+    *(float *)value = (*(Preferences *)(clientData)).minVarianceTrhesh;
 }
 
 void initTweakBar(DynamicShape& ds){
@@ -126,8 +149,12 @@ void initTweakBar(DynamicShape& ds){
     TwAddVarRW(myBar, "Damp", TW_TYPE_FLOAT, &ds.prefs.damp, " min=0.0 max=1.0 step=0.001 keyIncr=a keyDecr=s help=' '");
     TwAddVarRW(myBar, "Trail", TW_TYPE_FLOAT, &ds.prefs.trailing, " min=0.0 max=1.0 step=0.01 keyIncr=i keyDecr=u help=' '");
     TwAddVarRW(myBar, "TrailThresh", TW_TYPE_FLOAT, &ds.prefs.trailThres, " min=0.0 max=20.0 step=0.01 keyIncr=h keyDecr=j help=' '");
-    TwAddVarRW(myBar, "Min variance", TW_TYPE_FLOAT, &ds.prefs.minVarianceTrhesh, " min=0.0 max=5.0 step=0.01 keyIncr=o keyDecr=p help=' '");
-    TwAddVarRW(myBar, "Max variance", TW_TYPE_FLOAT, &ds.prefs.maxVarianceTrhesh, " min=0.0 max=20.0 step=0.01 keyIncr=k keyDecr=l help=' '");
+
+//  TwAddVarRW(myBar, "Min variance", TW_TYPE_FLOAT, &ds.prefs.minVarianceTrhesh, " min=0.0 max=5.0 step=0.01 keyIncr=o keyDecr=p help=' '");
+//  TwAddVarRW(myBar, "Max variance", TW_TYPE_FLOAT, &ds.prefs.maxVarianceTrhesh, " min=0.0 max=20.0 step=0.01 keyIncr=k keyDecr=l help=' '");
+    TwAddVarCB(myBar, "Min variance", TW_TYPE_FLOAT, setCBMinVar, getCBMinVar, &ds.prefs, " min=0.0 max=5.0 step=0.01 keyIncr=o keyDecr=p help=' '");
+    TwAddVarCB(myBar, "Max variance", TW_TYPE_FLOAT, setCBMaxVar, getCBMaxVar, &ds.prefs, " min=0.0 max=20.0 step=0.01 keyIncr=k keyDecr=l help=' '");
+
     TwAddVarRW(myBar, "R", TW_TYPE_FLOAT, &ds.prefs.R, " min=0.0 max=200.0 step=0.1 keyIncr=k keyDecr=l help=' '");
     TwAddVarRW(myBar, "APPLICATION DISTANCE", TW_TYPE_FLOAT, &ds.prefs.applicationDistance, " min=-10.0 max=10.0 step=0.01 keyIncr=k keyDecr=l help=' ' ");
 
@@ -156,7 +183,6 @@ void initTweakBar(DynamicShape& ds){
     TwAddVarRO(myBar, "HardCnt", TW_TYPE_INT32, &ds.prefs.hardCnt, "label='Hard' group='Bonds number' ");
     TwAddVarRO(myBar, "SoftCnt", TW_TYPE_INT32, &ds.prefs.softCnt, "label='Soft:' group='Bonds number' ");
 
-    //TwAddVarCB(myBar, "aacb", TW_TYPE_INT32, SetCallback, GetCallback, NULL, NULL);
 
     TwAddSeparator(myBar,"sep3",NULL);
 
@@ -174,8 +200,8 @@ int main(int argc, char** argv){
     glutInitWindowPosition(5, 5);
     glutCreateWindow("Animated Mol");
 
-    //Preferences prefs;
     initComponents(renderer.ds.prefs);
+
     // Check if glew is ok
     renderer.init();
 

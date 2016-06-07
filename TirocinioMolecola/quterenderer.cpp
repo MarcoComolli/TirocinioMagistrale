@@ -109,7 +109,8 @@ QuteRenderer::QuteRenderer(DynamicShape &ds):ds(ds){
 }
 
 void QuteRenderer::loadShadersSources(){
-    progFinalBall.loadSources("./ballFinal");
+
+    progFinalBall.loadSources("F:/Documenti - Marco/Documenti/Universita/Tirocinio Magistrale/qt_workspace/TirocinioMolecola/ballFinal");
 }
 
 
