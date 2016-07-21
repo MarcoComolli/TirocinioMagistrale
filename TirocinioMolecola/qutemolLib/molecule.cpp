@@ -630,8 +630,14 @@ void Molecule::fillShape(Shape &p, const ShapingOptions &opt,
 
 
 
-        Col fixedColor;
-        newBall.col = fixedColor;
+        //Col fixedColor;
+        //newBall.col = fixedColor;
+
+        newBall.col =
+            type.col * colPerAtom
+            + chainCols[ (a.chainId)%chainCols.size() ] * colPerChain
+            + chainCols[ (modelId)%chainCols.size() ] * colPerModel
+        ;
 
         // kill spheres completely cut out by the cut-plane (optional)
 //        if (useCutPlane &&

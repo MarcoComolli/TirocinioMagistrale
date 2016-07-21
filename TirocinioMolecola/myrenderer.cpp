@@ -596,7 +596,6 @@ void MyRenderer::render(){
         printGrid();
     }
 
-
 }
 
 static vector<vec3> generateColors(vector<vec3> cubesVertices){

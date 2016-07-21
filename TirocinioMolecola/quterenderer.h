@@ -13,7 +13,7 @@ class QuteRenderer{
 
 
 public:
-    QuteRenderer(DynamicShape &ds);
+    QuteRenderer();
 
     DynamicShape ds;
     PairStatistics ps;
@@ -23,6 +23,8 @@ public:
     void updatePatchSizes();
 
     void maybePrepareDisplayList( FeedbackFunctionT f = NULL );
+    void initGlew();
+    void setDynamicShape(DynamicShape &ds);
 
     /* rendering functions */
     /* ******************* */
@@ -59,6 +61,10 @@ public:
 
 
     void loadShadersSources();
+
+
+    /* dynamics methods*/
+    void impressUserRotation(qmol::Vec axis, qmol::Scalar angle);
 
 private:
 

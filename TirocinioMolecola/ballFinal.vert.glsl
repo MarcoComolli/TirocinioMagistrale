@@ -42,7 +42,7 @@ void main()
         clipPos.xy += (clipUnitSize*cor) * _radius;
 	//clipPos.w -= (clipPos.w)*dot(cor,clipPos.xy)*0.02;// /gl_ProjectionMatrix[2][2];
 
-	gl_Position = clipPos;
+        gl_Position = clipPos;
 
 
         rad = _radius * scale / (gl_Position.w*gl_Position.w) ;

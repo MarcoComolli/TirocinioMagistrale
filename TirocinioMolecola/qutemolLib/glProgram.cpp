@@ -53,6 +53,7 @@ void glProgram::reset(void)
 
 bool glProgram::buildAll(void){
 
+
     const bool r = this->do_setup(
         vertex_source.c_str(),
         0,
@@ -260,6 +261,7 @@ void glProgram::silent_cleanup(void)
 
 bool glProgram::do_setup(const char * vertex_src, const char * geometry_src, const char * fragment_src, GLenum primitive_input_type, GLenum primitive_output_type, int max_output_vertices)
 {
+
 #if assert_SETUP_CLEANUP
     assert(this->m_prog == 0);
 #endif
@@ -274,6 +276,8 @@ bool glProgram::do_setup(const char * vertex_src, const char * geometry_src, con
 
     int n_lines;
     std::string prefix = make_prefix( n_lines ).c_str();
+
+
 
     this->m_vshd = this->create_shader(GL_VERTEX_SHADER, prefix.c_str(), vertex_src, m_log, n_lines);
 
@@ -305,6 +309,7 @@ bool glProgram::do_setup(const char * vertex_src, const char * geometry_src, con
 GLuint glProgram::create_shader(GLenum type, const char * prefix, const char * src, std::string & compile_log, int n_prefix_lines)
 {
 
+
     GLuint shd = glCreateShader(type);
 
     std::string ss;
@@ -331,9 +336,15 @@ GLuint glProgram::create_shader(GLenum type, const char * prefix, const char * s
         ss += prefix;
         ss += "\n\n";
     }
-    ss += src;
+    std::string src_str(src);
+    ss = ss.append(src_str);
 
     const char * s = ss.c_str();
+
+
+    std::string stt(prefix);
+    //std::cout << "PREFISSO: " << stt << std::endl;
+
 
     glShaderSource(shd, 1, &s, 0);
     glCompileShader(shd);
@@ -402,19 +413,26 @@ GLuint glProgram::create_shader(GLenum type, const char * prefix, const char * s
     return shd;
 }
 
-GLuint glProgram::create_program(GLuint vs, GLuint gs, GLuint fs, GLenum primitive_input_type, GLenum primitive_output_type, int max_output_vertices, std::string & compile_log)
-{
+GLuint glProgram::create_program(GLuint vs, GLuint gs, GLuint fs, GLenum primitive_input_type, GLenum primitive_output_type, int max_output_vertices, std::string & compile_log){
+    std::cout << "Entro nel create program" << std::endl;
+
+    std::cout << "STEP 0 v: " <<  vs << " g: " << gs << " f: " << fs << std::endl;
     GLuint prog = glCreateProgram();
 
     if (vs != 0) glAttachShader(prog, vs);
     if (gs != 0) glAttachShader(prog, gs);
     if (fs != 0) glAttachShader(prog, fs);
 
-    if (gs != 0)
-    {
+    if (gs != 0){
         glProgramParameteriEXT(prog, GL_GEOMETRY_INPUT_TYPE_EXT,   GLint(primitive_input_type));
         glProgramParameteriEXT(prog, GL_GEOMETRY_OUTPUT_TYPE_EXT,  GLint(primitive_output_type));
         glProgramParameteriEXT(prog, GL_GEOMETRY_VERTICES_OUT_EXT, GLint(max_output_vertices));
+    }
+
+
+    if (prog == 0) {
+        fprintf(stderr, "Error creating shader program\n");
+        exit(1);
     }
 
     m_prog = prog;
@@ -425,7 +443,7 @@ GLuint glProgram::create_program(GLuint vs, GLuint gs, GLuint fs, GLenum primiti
 
     allBuilt = true;
 
-    //compile_log += "*********************\n";
+    compile_log += "*********************\n";
     compile_log += "[Program Log]\n";
 
     GLint ls = 0;
@@ -459,7 +477,7 @@ GLuint glProgram::create_program(GLuint vs, GLuint gs, GLuint fs, GLenum primiti
     }
     compile_log += "\n";
 
-    //compile_log += "*********************\n";
+    compile_log += "*********************\n";
     compile_log += "\n";
 
     if (ls == GL_FALSE)

@@ -126,7 +126,6 @@ void DynamicShape::applyFixedConstrains(const PairStatistics& ps){
 */
 
 void DynamicShape::doPhysicsStep(Scalar dt, const PairStatistics& ps){
-
     if (prefs.softBonds) {
         applySprings(ps,dt);
     }

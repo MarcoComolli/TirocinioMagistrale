@@ -646,8 +646,7 @@ void bind_surface(glSurface * s, bool setup_viewport)
     }
 }
 
-void bind_surface_target(glSurface & s, int i)
-{
+void bind_surface_target(glSurface & s, int i){
     GLuint obj = s.target_texture_id(i);
     assert(obj != 0);
     GLenum target = (s.layers() > 0) ? (GL_TEXTURE_2D_ARRAY) : (GL_TEXTURE_2D);

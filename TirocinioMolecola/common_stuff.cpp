@@ -10,6 +10,7 @@
 #include <dynamicshape.h>
 #include <spatialgrid.h>
 #include <AntTweakBar.h>
+#include <quterenderer.h>
 
 #include <GL/glew.h>
 
@@ -54,7 +55,7 @@ string printCoords(qmol::Pos coord){
 //DynamicShape dsglobal;
 //PairStatistics psglobal;
 MyRenderer renderer;
-
+QuteRenderer quteRenderer;
 
 
 vector<qmol::Shape> getShapes(){
@@ -74,16 +75,18 @@ vector<qmol::Shape> getShapes(){
     if(!mol.isEmpty()){
         Shape shape;
         ShapingOptions opt;
-        opt.mode = 2;
-        opt.keepHeteros = true;
-        opt.keepHydrogens = true;
-        opt.selectedOnly = false;
-        opt.colorizeMode = 0;
-        opt.showOnlyModel = -1;
+//        opt.mode = 2;
+//        opt.keepHeteros = true;
+//        opt.keepHydrogens = true;
+//        opt.selectedOnly = false;
+//        opt.colorizeMode = 0;
+//        opt.showOnlyModel = -1;
+        opt.setDefaults();
 
         AtomTable table;
         table.loadCSV("F:/Programmazione/qtmol/qutemol2/qutemolLib/atomTable.csv");
         ChainTable chaintable;
+        chaintable.setRandom(400);
 
         for (int i = 1; i < mol.nModels() + 1 ; i++) { //per ogni modello
             mol.makeSingleShape(shape,opt,table, chaintable, i);  //crea lo shape di id = i
@@ -116,36 +119,66 @@ void initGrid(DynamicShape& ds, SpatialGrid& gr){
             ((gr.gridX.size())*(gr.gridY.size()));
 }
 
-void initComponents(Preferences& prefs){
+void initComponents(Preferences& prefs, bool isQuteRendering){
 
     vector<qmol::Shape> shapes = getShapes();
 
-    DynamicShape& ds (renderer.ds);
-    ds.copyFrom(shapes[0]);
+    if (isQuteRendering) {
+        DynamicShape& ds (quteRenderer.ds);
+        ds.copyFrom(shapes[0]);
+        ds.prefs = prefs;
+        SpatialGrid &gr(quteRenderer.grid);
+        initGrid(ds,gr);
+        PairStatistics& ps (quteRenderer.ps);
+        ps = gr.generatePairStatistcs(ds,3.4,ds.prefs.numberExtraBonds);
 
-    ds.prefs = prefs;
+        for (uint i = 0; i < shapes.size() ; i++) { //per ogni modello
+            ps.add_shape(shapes[i]);
+        }
 
-    SpatialGrid &gr(renderer.grid);
-    initGrid(ds,gr);
+        ps.calculateStats();
+        ps.printStats();
 
-    PairStatistics& ps (renderer.ps);
-    ps = gr.generatePairStatistcs(ds,3.4,ds.prefs.numberExtraBonds);
+        cout << "rispetto al max: " << ds.ball.size()*ds.ball.size() << " e': " << ps.pairs.size() <<
+                "\nCioe' " << ds.ball.size()*(qmol::Scalar)ds.ball.size()/ps.pairs.size() << " volte meno numeroso" << endl;
 
-    for (uint i = 0; i < shapes.size() ; i++) { //per ogni modello
-        ps.add_shape(shapes[i]);
+        ds.calculatePSBonds(ps);
+
+        ps.printStats();
+
+        ps.updateDistancesFromShape(shapes[0]);
+
+    }
+    else{
+        DynamicShape& ds (renderer.ds);
+        ds.copyFrom(shapes[0]);
+        ds.prefs = prefs;
+        SpatialGrid &gr(renderer.grid);
+        initGrid(ds,gr);
+        PairStatistics& ps (renderer.ps);
+
+        ps = gr.generatePairStatistcs(ds,3.4,ds.prefs.numberExtraBonds);
+
+        for (uint i = 0; i < shapes.size() ; i++) { //per ogni modello
+            ps.add_shape(shapes[i]);
+        }
+
+        ps.calculateStats();
+        ps.printStats();
+
+        cout << "rispetto al max: " << ds.ball.size()*ds.ball.size() << " e': " << ps.pairs.size() <<
+                "\nCioe' " << ds.ball.size()*(qmol::Scalar)ds.ball.size()/ps.pairs.size() << " volte meno numeroso" << endl;
+
+        ds.calculatePSBonds(ps);
+
+        ps.printStats();
+
+        ps.updateDistancesFromShape(shapes[0]);
     }
 
-    ps.calculateStats();
-    ps.printStats();
 
-    cout << "rispetto al max: " << ds.ball.size()*ds.ball.size() << " e': " << ps.pairs.size() <<
-            "\nCioe' " << ds.ball.size()*(qmol::Scalar)ds.ball.size()/ps.pairs.size() << " volte meno numeroso" << endl;
 
-    ds.calculatePSBonds(ps);
 
-    ps.printStats();
-
-    ps.updateDistancesFromShape(shapes[0]);
 
 
 }
@@ -182,7 +215,7 @@ void processMouse(int button, int state, int x, int y, int modifiers){
 }
 
 
-void mouseMotion(int x, int y){
+void mouseMotion(int x, int y, bool isQuteRend){
     if(TwEventMouseMotionGLUT(x,y)){
         return;
     }
@@ -192,11 +225,15 @@ void mouseMotion(int x, int y){
 
     if(pressedButton == RIGHT_BUTTON){
         qmol::Vec axis(0,0,1);
-        renderer.impressUserRotation(axis, dx);
+
+        if(isQuteRend){quteRenderer.impressUserRotation(axis, dx);}
+        else{renderer.impressUserRotation(axis, dx);}
     }else{
         //trascinamento
         qmol::Vec axis(dy, dx,0);
-        renderer.impressUserRotation(axis, axis.Norm());
+        if(isQuteRend){quteRenderer.impressUserRotation(axis, axis.Norm());}
+        else{renderer.impressUserRotation(axis, axis.Norm());}
+
     }
 
     xStored = x;

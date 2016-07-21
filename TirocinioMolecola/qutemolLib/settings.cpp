@@ -6,10 +6,10 @@ namespace qmol {
 
 void RenderingSettings::setDefaults(){
 
-	background = Col(0.3,0.3,0.3);
+    background = Col(0.3,0.3,0.6);
 
 	saturation = 0.5;
-	shininess = 0.0;
+    shininess = 0.0;
 	glossiness = 1<<5;
 
 	ambientLightAmount = 0.0;

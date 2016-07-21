@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include <qutemolLib/glSurface.h>
 #include <qutemolLib/glProgram.h>
+#include <QDebug>
 
 namespace attr{
 declare_shader_attribute( position );
@@ -75,7 +76,7 @@ inline int toPercent( float x ){
 
 using namespace qmol;
 
-QuteRenderer::QuteRenderer(DynamicShape &ds):ds(ds){
+QuteRenderer::QuteRenderer(){
 
     irradianceMap = new qmol::glSurface();
 
@@ -108,8 +109,19 @@ QuteRenderer::QuteRenderer(DynamicShape &ds):ds(ds){
 
 }
 
-void QuteRenderer::loadShadersSources(){
+void QuteRenderer::initGlew(){
+        GLenum res = glewInit();
+        if (res != GLEW_OK) {
+            glewGetErrorString(res);
+            throw std::runtime_error("A GLEW error occurred");
+        }
+}
 
+void QuteRenderer::setDynamicShape(DynamicShape &ds){
+    this->ds = ds;
+}
+
+void QuteRenderer::loadShadersSources(){
     progFinalBall.loadSources("F:/Documenti - Marco/Documenti/Universita/Tirocinio Magistrale/qt_workspace/TirocinioMolecola/ballFinal");
 }
 
@@ -122,13 +134,13 @@ void QuteRenderer::updateAllDefinesInShaders(){
     progFinalBall.set( USE_COLORED_LIGHTS , settings.coloredLightEnabled );
     progFinalBall.set( USE_TWO_WAY_LIGHT , settings.oppositeLightAmount );
 
-    progFinalBall.set( USE_SHADOW_MAP , isShadowMapNeeded() );
+    progFinalBall.set( USE_SHADOW_MAP , false /*isShadowMapNeeded()*/ );
 
     progFinalBall .set( USE_CUT_PLANE , cutPlaneEnabled );
 
 
     progFinalBall   .set( CARE_FOR_ALPHA, careForAlpha );
-    progDepthOfField.set( CARE_FOR_ALPHA, careForAlpha );
+    //progDepthOfField.set( CARE_FOR_ALPHA, careForAlpha );
 
     progFinalBall.set( USE_BORDERS , settings.borderSize>0 );
 
@@ -250,12 +262,14 @@ void QuteRenderer::maybePrepareDisplayList(FeedbackFunctionT feedback) {
         static int _invocation = 0;
         int invocation = _invocation++;
 
+
         //debug("Making a DL for %d balls", shape.ball.size() );
         //if (feedback) debug("(with feedback)"); else debug("(withOUT feedback)");
 
         dlBallsCount = 0;
         int countdown = 0;
 
+        irradianceMapSize = 1;
         int nPatchesPerRow = irradianceMapSize / patchSizeTexels;
         int nExpectedLists = div_ceil( ds.ball.size() , performanceSettings.displayListSize);
 
@@ -285,9 +299,9 @@ void QuteRenderer::maybePrepareDisplayList(FeedbackFunctionT feedback) {
                 glBegin(GL_QUADS);
 
                 dlBallsCount++;
-
             }
-            float u = i%nPatchesPerRow + 0.5f, v = i/nPatchesPerRow + 0.5f;
+            float u = i%nPatchesPerRow + 0.5f;
+            float v = i/nPatchesPerRow + 0.5f;
             const int BORDER = 0; // JUST FOR A TEST  (even, please)
             glVertexAttrShort(attr::uv,
                          u*(BORDER+patchSizeTexels)/irradianceMapSize, v*(BORDER+patchSizeTexels)/irradianceMapSize );
@@ -311,7 +325,6 @@ void QuteRenderer::maybePrepareDisplayList(FeedbackFunctionT feedback) {
             glVertex2f(-H,+1);
             glVertex2f(+H,+1);
             glEnd();*/
-
         }
 
         if (dlBallsCount!=0) {
@@ -355,9 +368,12 @@ void QuteRenderer::maybePrepareShader(qmol::glProgram &p){
 
 void QuteRenderer::maybePrepareShaders(){
     updateAllDefinesInShaders();
-    maybePrepareShader(progDepthOfField);
+    //maybePrepareShader(progDepthOfField);
     maybePrepareShader(progFinalBall);
 }
+
+
+
 
 void QuteRenderer::prepareBuffers(){
 
@@ -682,7 +698,6 @@ void QuteRenderer::glDrawOnTextureAndSplash(bool useDof, int superSample, glSurf
 }
 
 
-
 Matrix QuteRenderer::molSpace2shadowMapSpaceMatrix() const{
     float m[16] = { lightRot[0], lightRot[1], lightRot[2], 0,
                     lightRot[3], lightRot[4], lightRot[5], 0,
@@ -792,7 +807,6 @@ float QuteRenderer::simulatedLightingAmbient(){
     return settings.ambientLightAmount;
 }
 
-
 float QuteRenderer::simulatedLightingDiffuse(Vec n){
     float d = (n*settings.viewLightDir);
 
@@ -811,7 +825,6 @@ float QuteRenderer::simulatedLightingDiffuse(Vec n){
     }
 
 }
-
 
 float QuteRenderer::simulatedNormDotLight(Vec n){
     return n*settings.viewLightDir;
@@ -836,7 +849,6 @@ bool QuteRenderer::isShadowMapNeeded() const{
             ( !settings.semModeEnabled ) ;
 }
 
-
 void QuteRenderer::glDrawDirect(){
 
     glClearColor(settings.background[0],settings.background[1],settings.background[2],0);
@@ -844,9 +856,12 @@ void QuteRenderer::glDrawDirect(){
 
     if (!ds.ball.size()) return;
 
+//    std::cout << "THE BIG DEBUG COLOR BG: " << settings.background[0] << " " << settings.background[1]
+//              << " " << settings.background[2]<< std::endl;
+
     maybePrepareShaders();
 
-    directShadowMapEnabled =  isShadowMapNeeded() ;
+    directShadowMapEnabled =  false;//isShadowMapNeeded() ;
 
     if (directShadowMapEnabled) {
         updateShadowmapParam( viewSpaceVec2molSpaceVec( -settings.viewLightDir ) );
@@ -860,6 +875,8 @@ void QuteRenderer::glDrawDirect(){
     bind_program(progFinalBall);
 
     progFinalBall.set( unif::clipUnitSize, clipSizeX, clipSizeY );
+    //testing
+    //progFinalBall.set( unif::clipUnitSize, 2, 2 );
 
     progFinalBall.set( unif::patchSize,0.5f*(patchSizeTexels-1)/irradianceMapSize);
     progFinalBall.set( unif::saturation, settings.saturation/255.0, 1.0f-settings.saturation);
@@ -880,7 +897,7 @@ void QuteRenderer::glDrawDirect(){
         progFinalBall.set(unif::fogColor ,settings.background );
     }
 
-    if (settings.directLightAmount>0){
+    if (settings.directLightAmount>0){ //entro
         progFinalBall.set(unif::lightDir,settings.viewLightDir*settings.directLightAmount*(1.005f-settings.flattenDirectLight));
         if (settings.oppositeLightAmount>0){
             progFinalBall.set(unif::oppositeLight,-settings.oppositeLightAmount);
@@ -937,7 +954,7 @@ void QuteRenderer::glDrawDirect(){
         progFinalBall.set(unif::aoMul, (aoMul)*settings.ambientLightAmount );
     }
 
-    if (matPr[11]==0) {
+    if (matPr[11]==0) { //entro
         // orthogonal view
         progFinalBall.set(unif::scale,-0.5f * mvScale * matPr[10] );
     } else {
@@ -949,7 +966,7 @@ void QuteRenderer::glDrawDirect(){
         progFinalBall.set( unif::shadowAttenuation, settings.attenuateShadows );
     }
 
-    if ( isShadowMapNeeded() ) {
+    if ( false /*isShadowMapNeeded()*/ ) {
         progFinalBall.set( unif::shadowMap, 1);
         glActiveTexture( GL_TEXTURE1 );
 
@@ -987,11 +1004,28 @@ void QuteRenderer::glDrawDirect(){
 
     glSendBallData();
     bind_program(0);
+    //std::cout << "ds balls: " << ds.barycenter.X() << " "  << ds.barycenter.Y() << std::endl;
 }
-
 
 void QuteRenderer::glCenterView(){
     glScalef( 1/ds.radius , 1/ds.radius, 1/ds.radius);
     glTranslatef( -ds.barycenter[0],-ds.barycenter[1], -ds.barycenter[2] );
+}
+
+
+void QuteRenderer::impressUserRotation(qmol::Vec axis, qmol::Scalar angle){
+
+    Scalar angleView = angle*0.0;
+    Scalar anglePhys = angle*1.0;
+
+
+    //rotateView( axis, -angleView  *  0.0025 );
+
+    //ds.updateCenter();
+
+    for (int i = 0; i < 10; ++i) {
+        ds.rotateOnAxis(anglePhys/10, axis);
+    }
+
 }
 
