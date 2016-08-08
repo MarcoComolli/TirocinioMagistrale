@@ -77,11 +77,42 @@ static void terminateGlut(){
     TwTerminate();
 }
 
+void initQTrenderer(){
+
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluPerspective(70, (WINDOW_WIDTH)/WINDOW_HEIGHT, 0.1, 100.1);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glTranslatef(0,0,-80);
+
+
+    quteRenderer.settings.directLightAmount = 0.7;
+    quteRenderer.settings.ambientLightAmount = 0.8;
+
+    quteRenderer.glResetIrradianceMap();
+
+
+    //currentCutPlane = qmol::Plane(0,0,0,0);
+
+    quteRenderer.glCaptureCurrentMatrices();
+}
+
+
 void TW_CALL reloadAll(void * prefs){
     initComponents(*(Preferences *) (prefs), false );
     renderer.quaternion = Vec4(0,0,0,1);
     renderer.init();
 }
+
+void TW_CALL reloadAllQT(void * prefs){
+    initComponents(*(Preferences *) (prefs), true );
+    quteRenderer.geometryChanged();
+}
+
 
 //setters
 void TW_CALL setCBShowSoftBonds(const void *value, void *clientData){
@@ -115,6 +146,25 @@ void TW_CALL setCBMinVar(const void *value, void *clientData){
     initComponents(*(Preferences *) (clientData), false);
     renderer.generateBuffers((*(Preferences *)(clientData)));
 }
+
+
+void TW_CALL setCBMaxVarQT(const void *value, void *clientData){
+    (*(Preferences *)(clientData)).maxVarianceTrhesh = *(const float *)value;
+    initComponents(*(Preferences *) (clientData), true);
+    quteRenderer.geometryChanged();
+}
+void TW_CALL setCBMinVarQT(const void *value, void *clientData){
+    (*(Preferences *)(clientData)).minVarianceTrhesh = *(const float *)value;
+    initComponents(*(Preferences *) (clientData), true);
+    quteRenderer.geometryChanged();
+}
+
+void TW_CALL setCBExtraBondsQT(const void *value, void *clientData){
+    (*(Preferences *)(clientData)).numberExtraBonds = *(const int *)value;
+    initComponents(*(Preferences *) (clientData), true);
+   quteRenderer.geometryChanged();
+}
+
 
 
 //getters
@@ -214,14 +264,14 @@ void initTweakBarQT(DynamicShape& ds){
     TwDefine(" GLOBAL iconmargin='5 5' ");
     TwDefine(" GLOBAL fontsize=2 fontstyle=default contained=true buttonalign=left ");
 
-    TwAddVarCB(myBar, "ExtraBonds", TW_TYPE_INT32, setCBExtraBonds, getCBExtraBonds, &ds.prefs, "label='Extra bonds' min=0 max=500000 step=100 keyIncr=z keyDecr=x help=' '");
+    TwAddVarCB(myBar, "ExtraBonds", TW_TYPE_INT32, setCBExtraBondsQT, getCBExtraBonds, &ds.prefs, "label='Extra bonds' min=0 max=500000 step=100 keyIncr=z keyDecr=x help=' '");
 
     TwAddVarRW(myBar, "Damp", TW_TYPE_FLOAT, &ds.prefs.damp, " min=0.0 max=1.0 step=0.001 keyIncr=a keyDecr=s help=' '");
     TwAddVarRW(myBar, "Trail", TW_TYPE_FLOAT, &ds.prefs.trailing, " min=0.0 max=1.0 step=0.01 keyIncr=i keyDecr=u help=' '");
     TwAddVarRW(myBar, "TrailThresh", TW_TYPE_FLOAT, &ds.prefs.trailThres, " min=0.0 max=20.0 step=0.01 keyIncr=h keyDecr=j help=' '");
 
-    TwAddVarCB(myBar, "Min variance", TW_TYPE_FLOAT, setCBMinVar, getCBMinVar, &ds.prefs, " min=0.0 max=5.0 step=0.01 keyIncr=o keyDecr=p help=' '");
-    TwAddVarCB(myBar, "Max variance", TW_TYPE_FLOAT, setCBMaxVar, getCBMaxVar, &ds.prefs, " min=0.0 max=20.0 step=0.01 keyIncr=k keyDecr=l help=' '");
+    TwAddVarCB(myBar, "Min variance", TW_TYPE_FLOAT, setCBMinVarQT, getCBMinVar, &ds.prefs, " min=0.0 max=5.0 step=0.01 keyIncr=o keyDecr=p help=' '");
+    TwAddVarCB(myBar, "Max variance", TW_TYPE_FLOAT, setCBMaxVarQT, getCBMaxVar, &ds.prefs, " min=0.0 max=20.0 step=0.01 keyIncr=k keyDecr=l help=' '");
 
     TwAddVarRW(myBar, "R", TW_TYPE_FLOAT, &ds.prefs.R, " min=0.0 max=200.0 step=0.1 keyIncr=k keyDecr=l help=' '");
     TwAddVarRW(myBar, "APPLICATION DISTANCE", TW_TYPE_FLOAT, &ds.prefs.applicationDistance, " min=-10.0 max=10.0 step=0.01 keyIncr=k keyDecr=l help=' ' ");
@@ -240,38 +290,12 @@ void initTweakBarQT(DynamicShape& ds){
 
     TwAddSeparator(myBar,"sep3",NULL);
 
-    TwAddButton(myBar,"Reload!", reloadAll, &ds.prefs, NULL);
+    TwAddButton(myBar,"Reload!", reloadAllQT, &ds.prefs, NULL);
 
 }
 
 
-void initQTrenderer(){
 
-
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    gluPerspective(70, (WINDOW_WIDTH)/WINDOW_HEIGHT, 0.1, 100.1);
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-    glTranslatef(0,0,-80);
-
-
-    quteRenderer.settings.directLightAmount = 0.7;
-    quteRenderer.settings.ambientLightAmount = 0.8;
-
-    quteRenderer.glResetIrradianceMap();
-
-
-    //currentCutPlane = qmol::Plane(0,0,0,0);
-
-
-
-
-
-    quteRenderer.glCaptureCurrentMatrices();
-}
 
 int main(int argc, char** argv){
 

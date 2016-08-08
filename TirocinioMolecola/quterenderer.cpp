@@ -109,6 +109,7 @@ QuteRenderer::QuteRenderer(){
 
 }
 
+
 void QuteRenderer::initGlew(){
         GLenum res = glewInit();
         if (res != GLEW_OK) {
