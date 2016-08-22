@@ -11,7 +11,10 @@
 #include <AntTweakBar.h>
 #include <preferences.h>
 #include <quterenderer.h>
+#include <mydroptarget.h>
 
+#include <tchar.h>
+#include <windows.h>
 
 #include <GL/glut.h>
 
@@ -20,13 +23,14 @@
 
 extern MyRenderer renderer;
 extern QuteRenderer quteRenderer;
+
+
 void processKey(unsigned char);
 void processMouse(int,int,int,int,int);
 void setSpecKeyStatus(int);
 void initComponents(Preferences& prefs, bool isQuteRend);
 void mouseMotion(int x, int y, bool isQuteRend);
 bool isQuteRendering = true;
-
 
 
 void idleCallback(){
@@ -74,7 +78,25 @@ static void reshapeCB(int w, int h){
 
 static void terminateGlut(){
     std::cout << "TERMINATO GLUT" << std::endl;
+    OleUninitialize();
     TwTerminate();
+}
+
+string openFileName(char *filter = _T("All Files (*.*)\0*.*\0"), HWND owner = NULL) {
+  OPENFILENAME ofn;
+  char fileName[MAX_PATH] = _T("");
+  ZeroMemory(&ofn, sizeof(ofn));
+  ofn.lStructSize = sizeof(OPENFILENAME);
+  ofn.hwndOwner = owner;
+  ofn.lpstrFilter = filter;
+  ofn.lpstrFile = fileName;
+  ofn.nMaxFile = MAX_PATH;
+  ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+  ofn.lpstrDefExt = "";
+  string fileNameStr;
+  if ( GetOpenFileName(&ofn) )
+    fileNameStr = fileName;
+  return fileNameStr;
 }
 
 void initQTrenderer(){
@@ -90,8 +112,14 @@ void initQTrenderer(){
     glTranslatef(0,0,-80);
 
 
-    quteRenderer.settings.directLightAmount = 0.7;
-    quteRenderer.settings.ambientLightAmount = 0.8;
+    quteRenderer.settings.directLightAmount = 0.6;
+    quteRenderer.settings.ambientLightAmount = 0.7;
+    quteRenderer.settings.flattenDirectLight = 0.5;
+    quteRenderer.settings.borderSize = 0.0;
+    quteRenderer.settings.glossiness = 1;
+    quteRenderer.settings.shininess = 0.4;
+    quteRenderer.settings.saturation = 0.8;
+
 
     quteRenderer.glResetIrradianceMap();
 
@@ -112,6 +140,17 @@ void TW_CALL reloadAllQT(void * prefs){
     initComponents(*(Preferences *) (prefs), true );
     quteRenderer.geometryChanged();
 }
+
+void TW_CALL openNewMolQT(void * prefs){
+    string str = openFileName();
+    if(!str.empty()){
+        std::wstring wsTmp(str.begin(), str.end());
+        (*(Preferences *)(prefs)).molPath = wsTmp;
+        initComponents(*(Preferences *) (prefs), true );
+        quteRenderer.geometryChanged();
+    }
+}
+
 
 
 //setters
@@ -290,7 +329,20 @@ void initTweakBarQT(DynamicShape& ds){
 
     TwAddSeparator(myBar,"sep3",NULL);
 
+    TwAddVarRW(myBar, "Direct Light", TW_TYPE_FLOAT, &quteRenderer.settings.directLightAmount, " min=0.0 max=1.0 step=0.01  group='Rendering settings'");
+    TwAddVarRW(myBar, "Flat Direct Light", TW_TYPE_FLOAT, &quteRenderer.settings.flattenDirectLight, " min=0.0 max=1.0 step=0.01  group='Rendering settings'");
+    TwAddVarRW(myBar, "Ambient Light", TW_TYPE_FLOAT, &quteRenderer.settings.ambientLightAmount, " min=0.0 max=1.0 step=0.01  group='Rendering settings'");
+    TwAddVarRW(myBar, "Border", TW_TYPE_FLOAT, &quteRenderer.settings.borderSize, " min=0.0 max=1.0 step=0.01  group='Rendering settings'");
+    TwAddVarRW(myBar, "Glossiness", TW_TYPE_FLOAT, &quteRenderer.settings.glossiness, " min=0.0 max=1.0 step=0.01  group='Rendering settings'");
+    TwAddVarRW(myBar, "Shininess", TW_TYPE_FLOAT, &quteRenderer.settings.shininess, " min=0.0 max=1.0 step=0.01  group='Rendering settings'");
+    TwAddVarRW(myBar, "Saturation", TW_TYPE_FLOAT, &quteRenderer.settings.saturation, " min=0.0 max=1.0 step=0.01  group='Rendering settings'");
+
+    TwAddSeparator(myBar,"sep4",NULL);
+
     TwAddButton(myBar,"Reload!", reloadAllQT, &ds.prefs, NULL);
+
+    TwAddButton(myBar,"Open...", openNewMolQT, &ds.prefs, NULL);
+
 
 }
 
@@ -335,6 +387,17 @@ int main(int argc, char** argv){
 
     atexit(terminateGlut); //Funzione chiamata quando termina il main loop
 
-    glutMainLoop();
 
+    OleInitialize(NULL);
+    HDC a = wglGetCurrentDC();
+    HWND hw = WindowFromDC(a);
+
+    char wnd_title[256];
+    GetWindowText(hw,wnd_title,sizeof(wnd_title));
+    std::cout << "wnd_title " << wnd_title << std::endl;
+
+    MyDropTarget aa;
+    RegisterDragDrop(hw,&aa);
+
+    glutMainLoop();
 }

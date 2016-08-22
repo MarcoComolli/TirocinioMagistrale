@@ -12,6 +12,12 @@
 #include <AntTweakBar.h>
 #include <quterenderer.h>
 
+#include <mydroptarget.h>
+#include <shobjidl.h>
+
+#include <Commdlg.h>
+
+
 #include <GL/glew.h>
 
 #define LEFT_BUTTON 0
@@ -58,14 +64,10 @@ MyRenderer renderer;
 QuteRenderer quteRenderer;
 
 
-vector<qmol::Shape> getShapes(){
+vector<qmol::Shape> getShapes(wstring filename){
     qmol::Molecule mol;
 
-    //    wstring filename = L"F:/Programmazione/inputs/2KU2.pdb";
-    //    wstring filename = L"F:/Programmazione/inputs/2WWV.pdb";
-    //    wstring filename = L"F:/Programmazione/inputs/p53_2J10.pdb";
-    //    wstring filename = L"F:/Programmazione/inputs/p53_tumor_suppressor_3SAK.pdb";
-    wstring filename = L"F:/Programmazione/inputs/p53_tumor_suppressor_3SAK.pdb";
+
     mol.loadPDB(filename);
 
     using namespace qmol;
@@ -121,7 +123,7 @@ void initGrid(DynamicShape& ds, SpatialGrid& gr){
 
 void initComponents(Preferences& prefs, bool isQuteRendering){
 
-    vector<qmol::Shape> shapes = getShapes();
+    vector<qmol::Shape> shapes = getShapes(prefs.molPath);
 
     if (isQuteRendering) {
         DynamicShape& ds (quteRenderer.ds);
@@ -241,6 +243,9 @@ void mouseMotion(int x, int y, bool isQuteRend){
 
 }
 
+
+
+
 void processKey(unsigned char key){
     switch (key){
     case 'w':
@@ -248,10 +253,30 @@ void processKey(unsigned char key){
         renderer.ds.wiggle(0.9f);
         renderer.ds.updateBarycenter();
         break;
+    case 'c':
+    {
+//        std::cout << "pressed C" << std::endl;
+//       OleInitialize(NULL);
+//       HDC a = wglGetCurrentDC();
+//       HWND hw = WindowFromDC(a);
+//      // HWND hw = GetForegroundWindow();
+
+//        char wnd_title[256];
+//        GetWindowText(hw,wnd_title,sizeof(wnd_title));
+//        std::cout << "wnd_title " << wnd_title << std::endl;
+
+
+//       RegisterDragDrop(hw,&aa);
+
+}
+        break;
+
     default:
         break;
     }
 
 }
+
+
 
 

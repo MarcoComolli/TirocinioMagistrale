@@ -31,6 +31,13 @@ public:
     int hardCnt = -1;
     int softCnt = -1;
 
+    //    wstring filename = L"F:/Programmazione/inputs/2KU2.pdb";
+    //    wstring filename = L"F:/Programmazione/inputs/2WWV.pdb";
+    //    wstring filename = L"F:/Programmazione/inputs/p53_2J10.pdb";
+    //    wstring filename = L"F:/Programmazione/inputs/p53_tumor_suppressor_3SAK.pdb";
+
+    std::wstring molPath = L"F:/Programmazione/inputs/p53_tumor_suppressor_3SAK.pdb";
+
 
 
 

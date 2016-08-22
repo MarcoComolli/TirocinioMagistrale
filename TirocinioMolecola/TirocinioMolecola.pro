@@ -3,7 +3,7 @@ CONFIG += console c++11
 CONFIG -= app_bundle
 #CONFIG -= qt
 
-
+DEFINES -= UNICODE
 
 VCGLIB_PATH = F:/Programmazione/librerie_tesi_cpp/vcglib
 GLEW_PATH = C:/Users/Marco/Desktop/glew-1.13.0/glew-1.13.0/
@@ -24,7 +24,7 @@ LIBS +=  -lopengl32 -llibglew32 -lglu32
 LIBS += libfreeglut
 LIBS += -L$$FREEGLUT_PATH/lib/
 LIBS += -L$$ANTTWEAKBAR_PATH/lib -lAntTweakBar
-
+LIBS += -lcomdlg32 -lole32
 
 
 
@@ -42,7 +42,8 @@ SOURCES += qutemolLib\atomTable.cpp \
     spatialgrid.cpp \
     main_glut.cpp \
     common_stuff.cpp \
-    quterenderer.cpp
+    quterenderer.cpp \
+    mydroptarget.cpp
 
 
 
@@ -62,7 +63,8 @@ HEADERS += \
     dynamicshape.h \
     spatialgrid.h \
     preferences.h \
-    quterenderer.h
+    quterenderer.h \
+    mydroptarget.h
 
 
 

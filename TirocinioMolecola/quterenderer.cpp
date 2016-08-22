@@ -857,9 +857,6 @@ void QuteRenderer::glDrawDirect(){
 
     if (!ds.ball.size()) return;
 
-//    std::cout << "THE BIG DEBUG COLOR BG: " << settings.background[0] << " " << settings.background[1]
-//              << " " << settings.background[2]<< std::endl;
-
     maybePrepareShaders();
 
     directShadowMapEnabled =  false;//isShadowMapNeeded() ;
