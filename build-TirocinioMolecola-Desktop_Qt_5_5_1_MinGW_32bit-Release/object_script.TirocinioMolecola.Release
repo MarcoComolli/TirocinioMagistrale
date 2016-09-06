@@ -14,5 +14,6 @@ INPUT(
 ./release\main_glut.o
 ./release\common_stuff.o
 ./release\quterenderer.o
+./release\mydroptarget.o
 ./release\glew.o
 );

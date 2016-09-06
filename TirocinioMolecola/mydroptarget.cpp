@@ -28,8 +28,13 @@ STDMETHODIMP MyDropTarget::DragEnter(IDataObject* pDataObj, DWORD grfKeyState, P
             }
             DragFinish(hdrop);
 
-            if(checkPDBFromPath(pDropped)){}
-            return S_OK;
+            if(checkPDBFromPath(droppedFilePath.c_str())){
+                return S_OK;
+            }
+            else{
+                return E_INVALIDARG;
+            }
+
         }
         else{
             std::cout << "Questo e' un bel problema " << std::endl;
@@ -91,7 +96,5 @@ bool MyDropTarget::checkPDBFromPath(const char * path){
     else{
         return false;
     }
-
-
 }
 

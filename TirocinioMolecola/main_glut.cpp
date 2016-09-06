@@ -82,24 +82,38 @@ static void terminateGlut(){
     TwTerminate();
 }
 
-string openFileName(char *filter = _T("All Files (*.*)\0*.*\0"), HWND owner = NULL) {
-  OPENFILENAME ofn;
-  char fileName[MAX_PATH] = _T("");
-  ZeroMemory(&ofn, sizeof(ofn));
-  ofn.lStructSize = sizeof(OPENFILENAME);
-  ofn.hwndOwner = owner;
-  ofn.lpstrFilter = filter;
-  ofn.lpstrFile = fileName;
-  ofn.nMaxFile = MAX_PATH;
-  ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-  ofn.lpstrDefExt = "";
-  string fileNameStr;
-  if ( GetOpenFileName(&ofn) )
-    fileNameStr = fileName;
-  return fileNameStr;
+bool checkPDBFromPath(const char * path){
+    char drive[_MAX_DRIVE];
+    char dir[_MAX_DIR];
+    char fname[_MAX_FNAME];
+    char ext[_MAX_EXT];
+    _splitpath_s(path,drive,dir,fname,ext);
+    if(string(ext) == ".pdb"){
+         return true;
+    }
+    else{
+        return false;
+    }
 }
 
-void initQTrenderer(){
+string openFileName(char *filter = _T("All Files (*.*)\0*.*\0"), HWND owner = NULL) {
+    OPENFILENAME ofn;
+    char fileName[MAX_PATH] = _T("");
+    ZeroMemory(&ofn, sizeof(ofn));
+    ofn.lStructSize = sizeof(OPENFILENAME);
+    ofn.hwndOwner = owner;
+    ofn.lpstrFilter = filter;
+    ofn.lpstrFile = fileName;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+    ofn.lpstrDefExt = "";
+    string fileNameStr;
+    if ( GetOpenFileName(&ofn) )
+        fileNameStr = fileName;
+    return fileNameStr;
+}
+
+void initQuteRenderer(){
 
 
     glMatrixMode(GL_PROJECTION);
@@ -136,21 +150,22 @@ void TW_CALL reloadAll(void * prefs){
     renderer.init();
 }
 
-void TW_CALL reloadAllQT(void * prefs){
+void TW_CALL reloadAllQute(void * prefs){
     initComponents(*(Preferences *) (prefs), true );
     quteRenderer.geometryChanged();
 }
 
-void TW_CALL openNewMolQT(void * prefs){
+void TW_CALL openNewMolQute(void * prefs){
     string str = openFileName();
     if(!str.empty()){
-        std::wstring wsTmp(str.begin(), str.end());
-        (*(Preferences *)(prefs)).molPath = wsTmp;
-        initComponents(*(Preferences *) (prefs), true );
-        quteRenderer.geometryChanged();
+        if (checkPDBFromPath(str.c_str())) { //if is a .PDB file
+            std::wstring wsTmp(str.begin(), str.end());
+            (*(Preferences *)(prefs)).molPath = wsTmp;
+            initComponents(*(Preferences *) (prefs), true );
+            quteRenderer.geometryChanged();
+        }
     }
 }
-
 
 
 //setters
@@ -187,18 +202,18 @@ void TW_CALL setCBMinVar(const void *value, void *clientData){
 }
 
 
-void TW_CALL setCBMaxVarQT(const void *value, void *clientData){
+void TW_CALL setCBMaxVarQute(const void *value, void *clientData){
     (*(Preferences *)(clientData)).maxVarianceTrhesh = *(const float *)value;
     initComponents(*(Preferences *) (clientData), true);
     quteRenderer.geometryChanged();
 }
-void TW_CALL setCBMinVarQT(const void *value, void *clientData){
+void TW_CALL setCBMinVarQute(const void *value, void *clientData){
     (*(Preferences *)(clientData)).minVarianceTrhesh = *(const float *)value;
     initComponents(*(Preferences *) (clientData), true);
     quteRenderer.geometryChanged();
 }
 
-void TW_CALL setCBExtraBondsQT(const void *value, void *clientData){
+void TW_CALL setCBExtraBondsQute(const void *value, void *clientData){
     (*(Preferences *)(clientData)).numberExtraBonds = *(const int *)value;
     initComponents(*(Preferences *) (clientData), true);
    quteRenderer.geometryChanged();
@@ -255,7 +270,7 @@ void initTweakBar(DynamicShape& ds){
     TwAddVarCB(myBar, "Min variance", TW_TYPE_FLOAT, setCBMinVar, getCBMinVar, &ds.prefs, " min=0.0 max=5.0 step=0.01 keyIncr=o keyDecr=p help=' '");
     TwAddVarCB(myBar, "Max variance", TW_TYPE_FLOAT, setCBMaxVar, getCBMaxVar, &ds.prefs, " min=0.0 max=20.0 step=0.01 keyIncr=k keyDecr=l help=' '");
 
-    TwAddVarRW(myBar, "R", TW_TYPE_FLOAT, &ds.prefs.R, " min=0.0 max=200.0 step=0.1 keyIncr=k keyDecr=l help=' '");
+    TwAddVarRW(myBar, "R", TW_TYPE_FLOAT, &ds.prefs.R, " min=0.1 max=200.0 step=0.1 keyIncr=k keyDecr=l help=' '");
     TwAddVarRW(myBar, "APPLICATION DISTANCE", TW_TYPE_FLOAT, &ds.prefs.applicationDistance, " min=-10.0 max=10.0 step=0.01 keyIncr=k keyDecr=l help=' ' ");
 
     TwAddSeparator(myBar,"sep0",NULL);
@@ -291,7 +306,7 @@ void initTweakBar(DynamicShape& ds){
 }
 
 
-void initTweakBarQT(DynamicShape& ds){
+void initTweakBarQute(DynamicShape& ds){
     TwInit(TW_OPENGL, NULL);
     TwWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -303,16 +318,16 @@ void initTweakBarQT(DynamicShape& ds){
     TwDefine(" GLOBAL iconmargin='5 5' ");
     TwDefine(" GLOBAL fontsize=2 fontstyle=default contained=true buttonalign=left ");
 
-    TwAddVarCB(myBar, "ExtraBonds", TW_TYPE_INT32, setCBExtraBondsQT, getCBExtraBonds, &ds.prefs, "label='Extra bonds' min=0 max=500000 step=100 keyIncr=z keyDecr=x help=' '");
+    TwAddVarCB(myBar, "ExtraBonds", TW_TYPE_INT32, setCBExtraBondsQute, getCBExtraBonds, &ds.prefs, "label='Extra bonds' min=0 max=500000 step=100 keyIncr=z keyDecr=x help=' '");
 
     TwAddVarRW(myBar, "Damp", TW_TYPE_FLOAT, &ds.prefs.damp, " min=0.0 max=1.0 step=0.001 keyIncr=a keyDecr=s help=' '");
     TwAddVarRW(myBar, "Trail", TW_TYPE_FLOAT, &ds.prefs.trailing, " min=0.0 max=1.0 step=0.01 keyIncr=i keyDecr=u help=' '");
     TwAddVarRW(myBar, "TrailThresh", TW_TYPE_FLOAT, &ds.prefs.trailThres, " min=0.0 max=20.0 step=0.01 keyIncr=h keyDecr=j help=' '");
 
-    TwAddVarCB(myBar, "Min variance", TW_TYPE_FLOAT, setCBMinVarQT, getCBMinVar, &ds.prefs, " min=0.0 max=5.0 step=0.01 keyIncr=o keyDecr=p help=' '");
-    TwAddVarCB(myBar, "Max variance", TW_TYPE_FLOAT, setCBMaxVarQT, getCBMaxVar, &ds.prefs, " min=0.0 max=20.0 step=0.01 keyIncr=k keyDecr=l help=' '");
+    TwAddVarCB(myBar, "Min variance", TW_TYPE_FLOAT, setCBMinVarQute, getCBMinVar, &ds.prefs, " min=0.0 max=5.0 step=0.01 keyIncr=o keyDecr=p help=' '");
+    TwAddVarCB(myBar, "Max variance", TW_TYPE_FLOAT, setCBMaxVarQute, getCBMaxVar, &ds.prefs, " min=0.0 max=20.0 step=0.01 keyIncr=k keyDecr=l help=' '");
 
-    TwAddVarRW(myBar, "R", TW_TYPE_FLOAT, &ds.prefs.R, " min=0.0 max=200.0 step=0.1 keyIncr=k keyDecr=l help=' '");
+    TwAddVarRW(myBar, "R", TW_TYPE_FLOAT, &ds.prefs.R, " min=0.1 max=200.0 step=0.1 keyIncr=k keyDecr=l help=' '");
     TwAddVarRW(myBar, "APPLICATION DISTANCE", TW_TYPE_FLOAT, &ds.prefs.applicationDistance, " min=-10.0 max=10.0 step=0.01 keyIncr=k keyDecr=l help=' ' ");
 
     TwAddSeparator(myBar,"sep0",NULL);
@@ -339,9 +354,9 @@ void initTweakBarQT(DynamicShape& ds){
 
     TwAddSeparator(myBar,"sep4",NULL);
 
-    TwAddButton(myBar,"Reload!", reloadAllQT, &ds.prefs, NULL);
+    TwAddButton(myBar,"Reload!", reloadAllQute, &ds.prefs, NULL);
 
-    TwAddButton(myBar,"Open...", openNewMolQT, &ds.prefs, NULL);
+    TwAddButton(myBar,"Open...", openNewMolQute, &ds.prefs, NULL);
 
 
 }
@@ -363,9 +378,9 @@ int main(int argc, char** argv){
         glutDisplayFunc(displayCallbackQR); //funzione invocata quando c'è del rendering da fare
         glutIdleFunc(idleCallbackQR); //funzione quando non c'è necessità di rendering
 
-        initTweakBarQT(quteRenderer.ds);
+        initTweakBarQute(quteRenderer.ds);
 
-        initQTrenderer();
+        initQuteRenderer();
     }
     else{
         initComponents(renderer.ds.prefs, isQuteRendering); //wireframe Renderer

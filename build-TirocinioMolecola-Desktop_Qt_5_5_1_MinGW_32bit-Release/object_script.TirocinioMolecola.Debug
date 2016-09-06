@@ -14,5 +14,6 @@ INPUT(
 ./debug\main_glut.o
 ./debug\common_stuff.o
 ./debug\quterenderer.o
+./debug\mydroptarget.o
 ./debug\glew.o
 );

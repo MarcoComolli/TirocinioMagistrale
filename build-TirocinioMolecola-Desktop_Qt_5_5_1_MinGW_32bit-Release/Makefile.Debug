@@ -17,7 +17,7 @@ CXXFLAGS      = -pipe -fno-keep-inline-dllexport -g -std=c++0x -frtti -Wall -Wex
 INCPATH       = -I..\TirocinioMolecola -I. -IF:\Programmazione\librerie_tesi_cpp\vcglib -IC:\Users\Marco\Desktop\glew-1.13.0\glew-1.13.0\include -IF:\Programmazione\librerie_tesi_cpp\freeglut\include -IF:\Programmazione\librerie_tesi_cpp\AntTweakBar\include -IF:\Programmazione\librerie_tesi_cpp\cg_tut -IF:\Programmazione\librerie_tesi_cpp\cg_tut\Lib -IF:\Programmazione\librerie_tesi_cpp\glm-0.9.7.1\glm -ID:\Programmi\QT\5.5\mingw492_32\include -ID:\Programmi\QT\5.5\mingw492_32\include\QtGui -ID:\Programmi\QT\5.5\mingw492_32\include\QtANGLE -ID:\Programmi\QT\5.5\mingw492_32\include\QtCore -Idebug -ID:\Programmi\QT\5.5\mingw492_32\mkspecs\win32-g++ 
 LINKER      =        g++
 LFLAGS        =        -Wl,-subsystem,console -mthreads
-LIBS        =        -LC:/Users/Marco/Desktop/glew-1.13.0/glew-1.13.0//lib/ -lopengl32 -llibglew32 -lglu32 -lfreeglut -LF:/Programmazione/librerie_tesi_cpp/freeglut//lib/ -LF:/Programmazione/librerie_tesi_cpp/AntTweakBar//lib -lAntTweakBar -lcomdlg32 -LD:/Programmi/QT/5.5/mingw492_32/lib -lQt5Guid -lQt5Cored 
+LIBS        =        -LC:/Users/Marco/Desktop/glew-1.13.0/glew-1.13.0//lib/ -lopengl32 -llibglew32 -lglu32 -lfreeglut -LF:/Programmazione/librerie_tesi_cpp/freeglut//lib/ -LF:/Programmazione/librerie_tesi_cpp/AntTweakBar//lib -lAntTweakBar -lcomdlg32 -lole32 -LD:/Programmi/QT/5.5/mingw492_32/lib -lQt5Guid -lQt5Cored 
 QMAKE         = D:\Programmi\QT\5.5\mingw492_32\bin\qmake.exe
 IDC           = idc
 IDL           = midl
@@ -58,6 +58,7 @@ SOURCES       = ..\TirocinioMolecola\qutemolLib\atomTable.cpp \
 		..\TirocinioMolecola\main_glut.cpp \
 		..\TirocinioMolecola\common_stuff.cpp \
 		..\TirocinioMolecola\quterenderer.cpp \
+		..\TirocinioMolecola\mydroptarget.cpp \
 		C:\Users\Marco\Desktop\glew-1.13.0\glew-1.13.0\src\glew.c 
 OBJECTS       = debug/atomTable.o \
 		debug/molecule.o \
@@ -74,6 +75,7 @@ OBJECTS       = debug/atomTable.o \
 		debug/main_glut.o \
 		debug/common_stuff.o \
 		debug/quterenderer.o \
+		debug/mydroptarget.o \
 		debug/glew.o
 
 DIST          = ballFinal.frag.glsl \
@@ -92,7 +94,8 @@ DIST          = ballFinal.frag.glsl \
 		..\TirocinioMolecola\dynamicshape.h \
 		..\TirocinioMolecola\spatialgrid.h \
 		..\TirocinioMolecola\preferences.h \
-		..\TirocinioMolecola\quterenderer.h ..\TirocinioMolecola\qutemolLib\atomTable.cpp \
+		..\TirocinioMolecola\quterenderer.h \
+		..\TirocinioMolecola\mydroptarget.h ..\TirocinioMolecola\qutemolLib\atomTable.cpp \
 		..\TirocinioMolecola\qutemolLib\molecule.cpp \
 		..\TirocinioMolecola\qutemolLib\shape.cpp \
 		..\TirocinioMolecola\qutemolLib\settings.cpp \
@@ -107,6 +110,7 @@ DIST          = ballFinal.frag.glsl \
 		..\TirocinioMolecola\main_glut.cpp \
 		..\TirocinioMolecola\common_stuff.cpp \
 		..\TirocinioMolecola\quterenderer.cpp \
+		..\TirocinioMolecola\mydroptarget.cpp \
 		C:\Users\Marco\Desktop\glew-1.13.0\glew-1.13.0\src\glew.c
 QMAKE_TARGET  = TirocinioMolecola
 DESTDIR        = debug\ #avoid trailing-slash linebreak
@@ -146,7 +150,7 @@ dist:
 	$(ZIP) TirocinioMolecola.zip $(SOURCES) $(DIST) ..\TirocinioMolecola\TirocinioMolecola.pro D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\spec_pre.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\qdevice.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\device_config.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\qconfig.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_3dcollision.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_3dcollision_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_3dcore.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_3dcore_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_3dinput.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_3dinput_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_3dlogic.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_3dlogic_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_3dquick.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_3dquick_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_3dquickrenderer.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_3dquickrenderer_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_3drenderer.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_3drenderer_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_axbase.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_axbase_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_axcontainer.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_axcontainer_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_axserver.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_axserver_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_bluetooth.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_bluetooth_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_bootstrap_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_clucene_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_concurrent.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_concurrent_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_core.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_core_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_dbus.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_dbus_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_declarative.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_declarative_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_designer.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_designer_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_designercomponents_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_enginio.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_enginio_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_gui.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_gui_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_help.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_help_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_location.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_location_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_multimedia.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_multimedia_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_multimediawidgets.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_multimediawidgets_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_network.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_network_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_nfc.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_nfc_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_opengl.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_opengl_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_openglextensions.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_openglextensions_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_platformsupport_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_positioning.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_positioning_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_printsupport.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_printsupport_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_qml.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_qml_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_qmldevtools_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_qmltest.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_qmltest_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_qtmultimediaquicktools_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_quick.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_quick_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_quickparticles_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_quickwidgets.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_quickwidgets_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_script.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_script_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_scripttools.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_scripttools_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_sensors.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_sensors_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_serialport.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_serialport_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_sql.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_sql_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_svg.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_svg_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_testlib.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_testlib_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_uiplugin.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_uitools.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_uitools_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_webchannel.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_webchannel_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_webkit.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_webkit_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_webkitwidgets.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_webkitwidgets_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_websockets.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_websockets_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_widgets.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_widgets_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_winextras.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_winextras_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_xml.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_xml_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_xmlpatterns.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\modules\qt_lib_xmlpatterns_private.pri D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\qt_functions.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\qt_config.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\win32\qt_config.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\win32-g++\qmake.conf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\spec_post.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\exclusive_builds.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\default_pre.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\win32\default_pre.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\resolve_config.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\exclusive_builds_post.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\default_post.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\build_pass.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\c++11.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\win32\console.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\win32\rtti.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\precompile_header.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\warn_on.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\qt.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\resources.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\moc.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\win32\opengl.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\testcase_targets.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\exceptions.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\yacc.prf D:\Programmi\QT\5.5\mingw492_32\mkspecs\features\lex.prf ..\TirocinioMolecola\TirocinioMolecola.pro D:/Programmi/QT/5.5/mingw492_32/lib/Qt5Guid.prl D:/Programmi/QT/5.5/mingw492_32/lib/Qt5Cored.prl  NO_PCH_SOURCES RESOURCES HEADERS SOURCES OBJECTIVE_SOURCES YACCSOURCES YACCSOURCES LEXSOURCES 
 
 clean: compiler_clean 
-	-$(DEL_FILE) debug\atomTable.o debug\molecule.o debug\shape.o debug\settings.o debug\glProgram.o debug\glSurface.o debug\atompair.o debug\pairstatistics.o debug\myrenderer.o debug\dynamicball.o debug\dynamicshape.o debug\spatialgrid.o debug\main_glut.o debug\common_stuff.o debug\quterenderer.o debug\glew.o
+	-$(DEL_FILE) debug\atomTable.o debug\molecule.o debug\shape.o debug\settings.o debug\glProgram.o debug\glSurface.o debug\atompair.o debug\pairstatistics.o debug\myrenderer.o debug\dynamicball.o debug\dynamicshape.o debug\spatialgrid.o debug\main_glut.o debug\common_stuff.o debug\quterenderer.o debug\mydroptarget.o debug\glew.o
 
 distclean: clean 
 	-$(DEL_FILE) $(DESTDIR_TARGET)
@@ -2786,6 +2790,7 @@ debug/main_glut.o: ../TirocinioMolecola/main_glut.cpp ../TirocinioMolecola/qutem
 		C:/Users/Marco/Desktop/glew-1.13.0/glew-1.13.0/include/GL/glew.h \
 		../TirocinioMolecola/qutemolLib/glProgram.h \
 		../TirocinioMolecola/log.h \
+		../TirocinioMolecola/mydroptarget.h \
 		F:/Programmazione/librerie_tesi_cpp/freeglut/include/GL/glut.h \
 		F:/Programmazione/librerie_tesi_cpp/freeglut/include/GL/freeglut_std.h \
 		D:/Programmi/QT/5.5/mingw492_32/include/QtANGLE/EGL/egl.h \
@@ -3036,7 +3041,8 @@ debug/common_stuff.o: ../TirocinioMolecola/common_stuff.cpp ../TirocinioMolecola
 		../TirocinioMolecola/qutemolLib/glSurface.h \
 		C:/Users/Marco/Desktop/glew-1.13.0/glew-1.13.0/include/GL/glew.h \
 		../TirocinioMolecola/qutemolLib/glProgram.h \
-		../TirocinioMolecola/log.h
+		../TirocinioMolecola/log.h \
+		../TirocinioMolecola/mydroptarget.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\common_stuff.o ..\TirocinioMolecola\common_stuff.cpp
 
 debug/quterenderer.o: ../TirocinioMolecola/quterenderer.cpp ../TirocinioMolecola/quterenderer.h \
@@ -3326,6 +3332,229 @@ debug/quterenderer.o: ../TirocinioMolecola/quterenderer.cpp ../TirocinioMolecola
 		D:/Programmi/QT/5.5/mingw492_32/include/QtCore/qset.h \
 		D:/Programmi/QT/5.5/mingw492_32/include/QtCore/qcontiguouscache.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\quterenderer.o ..\TirocinioMolecola\quterenderer.cpp
+
+debug/mydroptarget.o: ../TirocinioMolecola/mydroptarget.cpp ../TirocinioMolecola/mydroptarget.h \
+		../TirocinioMolecola/preferences.h \
+		../TirocinioMolecola/qutemolLib/basetypes.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/vcg/space/point3.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/vcg/space/deprecated_point3.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/vcg/math/base.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/vcg/math/eigen.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/LU \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/Core \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/util/DisableStupidWarnings.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/util/Macros.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/util/MKL_support.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/util/Constants.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/util/ForwardDeclarations.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/util/Meta.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/util/StaticAssert.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/util/XprHelper.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/util/Memory.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/NumTraits.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/MathFunctions.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/GenericPacketMath.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/arch/SSE/PacketMath.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/arch/SSE/MathFunctions.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/arch/SSE/Complex.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/arch/AltiVec/PacketMath.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/arch/AltiVec/Complex.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/arch/NEON/PacketMath.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/arch/NEON/Complex.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/arch/Default/Settings.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Functors.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/DenseCoeffsBase.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/DenseBase.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/plugins/BlockMethods.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/MatrixBase.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/plugins/CommonCwiseUnaryOps.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/plugins/CommonCwiseBinaryOps.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/plugins/MatrixCwiseUnaryOps.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/plugins/MatrixCwiseBinaryOps.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/EigenBase.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Assign.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/util/BlasUtil.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/DenseStorage.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/NestByValue.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/ForceAlignedAccess.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/ReturnByValue.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/NoAlias.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/PlainObjectBase.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Matrix.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Array.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/CwiseBinaryOp.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/CwiseUnaryOp.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/CwiseNullaryOp.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/CwiseUnaryView.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/SelfCwiseBinaryOp.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Dot.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/StableNorm.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/MapBase.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Stride.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Map.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Block.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/VectorBlock.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Ref.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Transpose.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/DiagonalMatrix.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Diagonal.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/DiagonalProduct.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/PermutationMatrix.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Transpositions.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Redux.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Visitor.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Fuzzy.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/IO.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Swap.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/CommaInitializer.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Flagged.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/ProductBase.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/GeneralProduct.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/TriangularMatrix.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/SelfAdjointView.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/GeneralBlockPanelKernel.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/Parallelizer.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/CoeffBasedProduct.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/GeneralMatrixVector.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/GeneralMatrixMatrix.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/SolveTriangular.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/GeneralMatrixMatrixTriangular.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/SelfadjointMatrixVector.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/SelfadjointMatrixMatrix.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/SelfadjointProduct.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/SelfadjointRank2Update.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/TriangularMatrixVector.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/TriangularMatrixMatrix.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/TriangularSolverMatrix.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/TriangularSolverVector.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/BandMatrix.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/CoreIterators.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/BooleanRedux.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Select.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/VectorwiseOp.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Random.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Replicate.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Reverse.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/ArrayBase.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/plugins/ArrayCwiseUnaryOps.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/plugins/ArrayCwiseBinaryOps.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/ArrayWrapper.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/GeneralMatrixMatrix_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/GeneralMatrixVector_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/GeneralMatrixMatrixTriangular_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/SelfadjointMatrixMatrix_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/SelfadjointMatrixVector_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/TriangularMatrixMatrix_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/TriangularMatrixVector_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/products/TriangularSolverMatrix_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/Assign_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/GlobalFunctions.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Core/util/ReenableStupidWarnings.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/Eigen2Support \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Macros.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Memory.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Meta.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Lazy.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Cwise.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/CwiseOperators.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/TriangularSolver.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Block.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/VectorBlock.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Minor.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/MathFunctions.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/misc/Solve.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/misc/Kernel.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/misc/Image.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/LU/FullPivLU.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/LU/PartialPivLU.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/LU/PartialPivLU_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/LU/Determinant.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/LU/Inverse.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/LU/arch/Inverse_SSE.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/LU.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/Geometry \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/SVD \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/QR \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/Cholesky \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Cholesky/LLT.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Cholesky/LDLT.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Cholesky/LLT_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/Jacobi \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Jacobi/Jacobi.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/Householder \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Householder/Householder.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Householder/HouseholderSequence.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Householder/BlockHouseholder.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/QR/HouseholderQR.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/QR/FullPivHouseholderQR.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/QR/ColPivHouseholderQR.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/QR/HouseholderQR_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/QR/ColPivHouseholderQR_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/QR.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/Eigenvalues \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigenvalues/Tridiagonalization.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigenvalues/RealSchur.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigenvalues/HessenbergDecomposition.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigenvalues/EigenSolver.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigenvalues/SelfAdjointEigenSolver.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigenvalues/GeneralizedSelfAdjointEigenSolver.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigenvalues/ComplexSchur.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigenvalues/ComplexEigenSolver.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigenvalues/RealQZ.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigenvalues/RealSchur_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigenvalues/ComplexSchur_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigenvalues/SelfAdjointEigenSolver_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/SVD/JacobiSVD.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/SVD/JacobiSVD_MKL.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/SVD/UpperBidiagonalization.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/SVD.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Geometry/OrthoMethods.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Geometry/EulerAngles.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Geometry/Homogeneous.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Geometry/RotationBase.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Geometry/Rotation2D.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Geometry/Quaternion.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Geometry/AngleAxis.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Geometry/Transform.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Geometry/Translation.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Geometry/Scaling.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Geometry/Hyperplane.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Geometry/ParametrizedLine.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Geometry/AlignedBox.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Geometry/Umeyama.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Geometry/arch/Geometry_SSE.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Geometry/All.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Geometry/RotationBase.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Geometry/Rotation2D.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Geometry/Quaternion.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Geometry/AngleAxis.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Geometry/Transform.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Geometry/Translation.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Geometry/Scaling.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Geometry/AlignedBox.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Geometry/Hyperplane.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/src/Eigen2Support/Geometry/ParametrizedLine.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/eigenlib/Eigen/Array \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/vcg/space/point4.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/vcg/space/deprecated_point4.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/vcg/math/matrix44.h \
+		../TirocinioMolecola/quterenderer.h \
+		../TirocinioMolecola/qutemolLib/baseTypes.h \
+		../TirocinioMolecola/dynamicshape.h \
+		../TirocinioMolecola/qutemolLib/shape.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/vcg/space/box3.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/vcg/space/line3.h \
+		F:/Programmazione/librerie_tesi_cpp/vcglib/vcg/space/plane3.h \
+		../TirocinioMolecola/atompair.h \
+		../TirocinioMolecola/spatialgrid.h \
+		../TirocinioMolecola/qutemolLib/settings.h \
+		../TirocinioMolecola/qutemolLib/glSurface.h \
+		C:/Users/Marco/Desktop/glew-1.13.0/glew-1.13.0/include/GL/glew.h \
+		../TirocinioMolecola/qutemolLib/glProgram.h \
+		../TirocinioMolecola/log.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\mydroptarget.o ..\TirocinioMolecola\mydroptarget.cpp
 
 debug/glew.o: C:/Users/Marco/Desktop/glew-1.13.0/glew-1.13.0/src/glew.c C:/Users/Marco/Desktop/glew-1.13.0/glew-1.13.0/include/GL/glew.h \
 		C:/Users/Marco/Desktop/glew-1.13.0/glew-1.13.0/include/GL/wglew.h \
