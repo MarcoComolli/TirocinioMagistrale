@@ -89,7 +89,7 @@ bool checkPDBFromPath(const char * path){
     char ext[_MAX_EXT];
     _splitpath_s(path,drive,dir,fname,ext);
     if(string(ext) == ".pdb"){
-         return true;
+        return true;
     }
     else{
         return false;
@@ -113,26 +113,27 @@ string openFileName(char *filter = _T("All Files (*.*)\0*.*\0"), HWND owner = NU
     return fileNameStr;
 }
 
-void initQuteRenderer(){
+void initQuteRenderer(bool firstTime){
 
 
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    gluPerspective(70, (WINDOW_WIDTH)/WINDOW_HEIGHT, 0.1, 100.1);
+    gluPerspective(70, (WINDOW_WIDTH)/WINDOW_HEIGHT, 0.1, 1000.1);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
-    glTranslatef(0,0,-80);
+    glTranslatef(0,0,-90);
 
-
-    quteRenderer.settings.directLightAmount = 0.6;
-    quteRenderer.settings.ambientLightAmount = 0.7;
-    quteRenderer.settings.flattenDirectLight = 0.5;
-    quteRenderer.settings.borderSize = 0.0;
-    quteRenderer.settings.glossiness = 1;
-    quteRenderer.settings.shininess = 0.4;
-    quteRenderer.settings.saturation = 0.8;
+    if(firstTime){
+        quteRenderer.settings.directLightAmount = 0.6;
+        quteRenderer.settings.ambientLightAmount = 0.7;
+        quteRenderer.settings.flattenDirectLight = 0.5;
+        quteRenderer.settings.borderSize = 0.0;
+        quteRenderer.settings.glossiness = 1;
+        quteRenderer.settings.shininess = 0.4;
+        quteRenderer.settings.saturation = 0.8;
+    }
 
 
     quteRenderer.glResetIrradianceMap();
@@ -141,6 +142,7 @@ void initQuteRenderer(){
     //currentCutPlane = qmol::Plane(0,0,0,0);
 
     quteRenderer.glCaptureCurrentMatrices();
+    quteRenderer.glCenterView();
 }
 
 
@@ -163,6 +165,7 @@ void TW_CALL openNewMolQute(void * prefs){
             (*(Preferences *)(prefs)).molPath = wsTmp;
             initComponents(*(Preferences *) (prefs), true );
             quteRenderer.geometryChanged();
+            initQuteRenderer(false);
         }
     }
 }
@@ -216,7 +219,7 @@ void TW_CALL setCBMinVarQute(const void *value, void *clientData){
 void TW_CALL setCBExtraBondsQute(const void *value, void *clientData){
     (*(Preferences *)(clientData)).numberExtraBonds = *(const int *)value;
     initComponents(*(Preferences *) (clientData), true);
-   quteRenderer.geometryChanged();
+    quteRenderer.geometryChanged();
 }
 
 
@@ -265,8 +268,8 @@ void initTweakBar(DynamicShape& ds){
     TwAddVarRW(myBar, "Trail", TW_TYPE_FLOAT, &ds.prefs.trailing, " min=0.0 max=1.0 step=0.01 keyIncr=i keyDecr=u help=' '");
     TwAddVarRW(myBar, "TrailThresh", TW_TYPE_FLOAT, &ds.prefs.trailThres, " min=0.0 max=20.0 step=0.01 keyIncr=h keyDecr=j help=' '");
 
-//  TwAddVarRW(myBar, "Min variance", TW_TYPE_FLOAT, &ds.prefs.minVarianceTrhesh, " min=0.0 max=5.0 step=0.01 keyIncr=o keyDecr=p help=' '");
-//  TwAddVarRW(myBar, "Max variance", TW_TYPE_FLOAT, &ds.prefs.maxVarianceTrhesh, " min=0.0 max=20.0 step=0.01 keyIncr=k keyDecr=l help=' '");
+    //  TwAddVarRW(myBar, "Min variance", TW_TYPE_FLOAT, &ds.prefs.minVarianceTrhesh, " min=0.0 max=5.0 step=0.01 keyIncr=o keyDecr=p help=' '");
+    //  TwAddVarRW(myBar, "Max variance", TW_TYPE_FLOAT, &ds.prefs.maxVarianceTrhesh, " min=0.0 max=20.0 step=0.01 keyIncr=k keyDecr=l help=' '");
     TwAddVarCB(myBar, "Min variance", TW_TYPE_FLOAT, setCBMinVar, getCBMinVar, &ds.prefs, " min=0.0 max=5.0 step=0.01 keyIncr=o keyDecr=p help=' '");
     TwAddVarCB(myBar, "Max variance", TW_TYPE_FLOAT, setCBMaxVar, getCBMaxVar, &ds.prefs, " min=0.0 max=20.0 step=0.01 keyIncr=k keyDecr=l help=' '");
 
@@ -313,7 +316,7 @@ void initTweakBarQute(DynamicShape& ds){
     TwBar *myBar;
 
     myBar = TwNewBar("Parameters");
-    TwDefine(" Parameters size='200 420' color='0 170 0' text=light"); // change default tweak bar size and color
+    TwDefine(" Parameters size='200 480' color='0 170 0' text=light"); // change default tweak bar size and color
     TwDefine(" Parameters alpha = 30 valueswidth=60 iconalign=horizontal iconpos=tl ");
     TwDefine(" GLOBAL iconmargin='5 5' ");
     TwDefine(" GLOBAL fontsize=2 fontstyle=default contained=true buttonalign=left ");
@@ -380,7 +383,7 @@ int main(int argc, char** argv){
 
         initTweakBarQute(quteRenderer.ds);
 
-        initQuteRenderer();
+        initQuteRenderer(true);
     }
     else{
         initComponents(renderer.ds.prefs, isQuteRendering); //wireframe Renderer

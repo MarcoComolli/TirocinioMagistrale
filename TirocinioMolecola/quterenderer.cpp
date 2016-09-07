@@ -1006,10 +1006,19 @@ void QuteRenderer::glDrawDirect(){
 }
 
 void QuteRenderer::glCenterView(){
-    glScalef( 1/ds.radius , 1/ds.radius, 1/ds.radius);
+    //glScalef( 1/ds.radius , 1/ds.radius, 1/ds.radius);
     glTranslatef( -ds.barycenter[0],-ds.barycenter[1], -ds.barycenter[2] );
 }
 
+
+
+void QuteRenderer::glZoomView(float amount){
+    glTranslatef( 0,0, amount);
+}
+
+void QuteRenderer::glRotY(float amount){
+    glRotatef(amount,0,1,0);
+}
 
 void QuteRenderer::impressUserRotation(qmol::Vec axis, qmol::Scalar angle){
 

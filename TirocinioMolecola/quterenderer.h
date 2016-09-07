@@ -30,6 +30,8 @@ public:
     /* ******************* */
 
     void glCenterView();
+    void glZoomView(float amount);
+    void glRotY(float amount);
     void glCaptureCurrentMatrices(); // call before any rendering
 
     void glDrawDirect();

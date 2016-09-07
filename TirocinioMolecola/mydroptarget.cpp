@@ -3,6 +3,7 @@
 
 
 void initComponents(Preferences& prefs, bool isQuteRend);
+void initQuteRenderer(bool first);
 
 extern QuteRenderer quteRenderer;
 
@@ -63,6 +64,7 @@ STDMETHODIMP MyDropTarget::Drop(IDataObject* pDataObj, DWORD grfKeyState, POINTL
         delete pDropped;
         quteRenderer.ds.prefs.molPath = wstring(droppedFilePath.begin(),droppedFilePath.end());
         initComponents(quteRenderer.ds.prefs, true);
+        initQuteRenderer(false);
         return S_OK;
     }
     else{

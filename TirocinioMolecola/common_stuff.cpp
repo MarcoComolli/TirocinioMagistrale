@@ -204,10 +204,13 @@ void processMouse(int button, int state, int x, int y, int modifiers){
     }
 
     if(button == SCROLL_DOWN){
-        renderer.panZ--;
+        //renderer.panZ--;
+        quteRenderer.glZoomView(-1);
     }
     if(button == SCROLL_UP){
-        renderer.panZ++;
+        //renderer.panZ++;
+        quteRenderer.glZoomView(1);
+
     }
 
 
@@ -230,6 +233,8 @@ void mouseMotion(int x, int y, bool isQuteRend){
 
         if(isQuteRend){quteRenderer.impressUserRotation(axis, dx);}
         else{renderer.impressUserRotation(axis, dx);}
+    }else if(pressedButton == MID_BUTTON){
+        quteRenderer.glRotY(dx);
     }else{
         //trascinamento
         qmol::Vec axis(dy, dx,0);
