@@ -8,16 +8,15 @@
 
 //#include <spatialgrid.h>
 
-enum class BoundType
-{
+enum class BoundType{
     NONE = 0,
     INTERSECT = 1,
     HARD = 2,
-    SOFT = 3
+    SOFT = 3,
+    COMPENETRATION = 4
 };
 
-class AtomPair
-{
+class AtomPair{
 public:
     AtomPair();
     AtomPair(int atomID1, int atomID2,
@@ -31,6 +30,11 @@ public:
     qmol::Scalar kSpring;
     BoundType constr;
 
+    bool compareTo(AtomPair ap) const;
+
+    bool operator<(const AtomPair &other) const {
+        return atomID1 < other.atomID1;
+    }
 
     //temp field for computation
 
@@ -38,6 +42,7 @@ public:
     qmol::Scalar varSumPlain;
     qmol::Scalar distSum;
     qmol::Scalar variance;
+
 
 
 
@@ -77,8 +82,6 @@ public:
 
 private:
     int calculateUniqueAtoms();
-
-
 };
 
 

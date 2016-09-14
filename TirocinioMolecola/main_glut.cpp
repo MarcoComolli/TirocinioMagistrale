@@ -115,7 +115,6 @@ string openFileName(char *filter = _T("All Files (*.*)\0*.*\0"), HWND owner = NU
 
 void initQuteRenderer(bool firstTime){
 
-
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -126,15 +125,14 @@ void initQuteRenderer(bool firstTime){
     glTranslatef(0,0,-90);
 
     if(firstTime){
-        quteRenderer.settings.directLightAmount = 0.6;
+        quteRenderer.settings.directLightAmount = 0.8;
         quteRenderer.settings.ambientLightAmount = 0.7;
         quteRenderer.settings.flattenDirectLight = 0.5;
         quteRenderer.settings.borderSize = 0.0;
         quteRenderer.settings.glossiness = 1;
         quteRenderer.settings.shininess = 0.4;
-        quteRenderer.settings.saturation = 0.8;
+        quteRenderer.settings.saturation = 0.95;
     }
-
 
     quteRenderer.glResetIrradianceMap();
 
@@ -360,8 +358,6 @@ void initTweakBarQute(DynamicShape& ds){
     TwAddButton(myBar,"Reload!", reloadAllQute, &ds.prefs, NULL);
 
     TwAddButton(myBar,"Open...", openNewMolQute, &ds.prefs, NULL);
-
-
 }
 
 

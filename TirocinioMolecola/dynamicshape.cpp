@@ -15,9 +15,7 @@ std::string printPos(qmol::Pos p){
     return  ss.str();
 }
 
-
 void DynamicShape::copyFrom(const qmol::Shape& s){
-
 
     clear();
     boundSphereCenter = s.center;
@@ -97,33 +95,81 @@ void DynamicShape::applyFixedConstrains(const PairStatistics& ps){
             ball.at(ps.pairs.at(i).atomID1).currPos += delta * (0.5 * diff);
             ball.at(ps.pairs.at(i).atomID2).currPos -= delta * (0.5 * diff);
     }
+}
 
+void DynamicShape::resolveCompenetration(int idx1, int idx2){
+
+    DynamicBall b1 = ball[idx1];
+    DynamicBall b2 = ball[idx2];
+
+    Scalar module = (b2.rad + b1.rad) - (b2.currPos - b1.currPos).Norm();
+
+    ball[idx1].currPos +=  (b1.currPos - b2.currPos).Normalize() * module/2;
+    ball[idx2].currPos +=  (b2.currPos - b1.currPos).Normalize() * module/2;
+
+    ball[idx1].prevPos =  ball[idx1].currPos;
+    ball[idx2].prevPos =  ball[idx2].currPos;
+
+}
+
+void DynamicShape::searchForCompenetration(int start,const PairStatistics& ps){
+    int pairsToBeTested = 100;
+    int interval = 100;
+    int atomIdx1 = start;
+    int atomIdx2;
+    bool areTheyIntersectBond = false;
+    for (int i = 0; i < pairsToBeTested; ++i){
+        atomIdx2 = (atomIdx1+interval+compenetrationIdxOffset)%ball.size();
+        if(testCompenetration(atomIdx1,atomIdx2)){
+            for (int j = ps.intersectStartIdx; j < ps.intersectEndIdx; ++j) {
+                if(ps.pairs[j].compareTo(AtomPair(atomIdx1,atomIdx2))){
+                    areTheyIntersectBond = true;
+                    break;
+                }
+            }
+           if(atomIdx1 < atomIdx2 && !areTheyIntersectBond){
+               probableCollisions.insert(AtomPair(atomIdx1, atomIdx2));
+           }
+           else if(atomIdx1 >= atomIdx2 && !areTheyIntersectBond){
+               probableCollisions.insert(AtomPair(atomIdx2, atomIdx1));
+           }
+        }
+        //std::cout << "tested: " << atomIdx1 << "-" << atomIdx2  << std::endl;
+        atomIdx1 = (atomIdx1+1)%ball.size();
+    }
+}
+
+
+void DynamicShape::checkProbableCollisions(){
+    if(probableCollisions.empty()){
+        return;
+    }
+    for (auto itr = probableCollisions.begin(); itr != probableCollisions.end(); ++itr){
+        AtomPair ap = *itr;
+        if(testCompenetration(ap.atomID1,ap.atomID2)){
+            resolveCompenetration(ap.atomID1, ap.atomID2);
+        }
+    }
 
 }
 
 
-/*//void DynamicShape::resolveCompenetration(const PairStatistics& ps){
-//    //std::cout << "count: " << f << std::endl;
-//    //AtomPair current;
-//   // AtomPair a;
-//   // for (uint i = 0; i < ball.size(); ++i) {
-//        //std::cout << "i: " << i << std::endl;
-//        //for (uint j = i; j < ball.size(); ++j) {
-//            //std::cout << "j: " << j << std::endl;
-//            //a.atomID1 = i;
-//            //a.atomID2 = j;
-//            //if( (current = ps.getAtomPair(a) ).atomID1 != -1){
-//                //if(current.constr != BoundType::INTERSECT){
-//                    //if(checkIntersect(i,j)){
-//                    //    ball[i].currPos = ball[i].prevPos;
-//                    //    ball[j].currPos = ball[j].prevPos;
-//                   // }
-//               // }
-//            //}
-//        }
-//    }
-//}
-*/
+//negative number mean that they intersect
+bool DynamicShape::testCompenetration(int idx1, int idx2){
+    DynamicBall db1 = ball.at(idx1);
+    DynamicBall db2 = ball.at(idx2);
+    Scalar currentDist = (db1.currPos - db2.currPos).Norm();
+    Scalar sumRadius = db1.rad + db2.rad;
+
+    if(currentDist < sumRadius){ //they intersect
+        return true;
+    }
+    else{                        //they don't intersect
+        return false;
+    }
+
+}
+
 
 void DynamicShape::doPhysicsStep(Scalar dt, const PairStatistics& ps){
     if (prefs.softBonds) {
@@ -145,8 +191,6 @@ void DynamicShape::doPhysicsStep(Scalar dt, const PairStatistics& ps){
             ball.at(i).prevPos = pNext;
             ball.at(i).currPos = pNext;
         }
-
-
     }
 
     if (prefs.hardBonds) {
@@ -155,12 +199,20 @@ void DynamicShape::doPhysicsStep(Scalar dt, const PairStatistics& ps){
         int i = 0;
         while (qmol::abs(errorDiff) > 0.0001 && i < 5){
             prevErr = error;
+            searchForCompenetration(compenetrationIdx, ps);
+            checkProbableCollisions();
             applyFixedConstrains(ps);
             errorDiff  = prevErr-error;
             i++;
         }
     }
     updateBarycenter();
+    compenetrationIdx = (compenetrationIdx+1)%ball.size();
+    if(compenetrationIdx == 0) {
+        compenetrationIdxOffset = (compenetrationIdxOffset+1)%ball.size();
+        std::cout << "compenetrationIdxOffset +1! -> " << compenetrationIdxOffset << std::endl;
+        std::cout << "da testare: " << probableCollisions.size() << std::endl;
+    }
 
 }
 
@@ -263,7 +315,7 @@ void DynamicShape::wiggle(Scalar entropy){
     }
 }
 
-//controlla se due atomi si intersecano
+//check if 2 atoms intersect each other
 bool DynamicShape::checkIntersect(int atomID1, int atomID2){
     qmol::Pos c1 = ball.at(atomID1).currPos;
     qmol::Pos c2 = ball.at(atomID2).currPos;
@@ -352,13 +404,6 @@ PairStatistics DynamicShape::generatePSThreshold(Scalar thresh){
 }
 
 void DynamicShape::rotateOnYAxis(Scalar force){
-    /* PSEUDOCODICE:
-     * per ogni sfera
-     *      calcola la distanza dall'asse
-     *      calcola la direzione della forza
-     *      calcola la forza del vettore in base alla distanza
-     *      somma il vec trovato alla currPos
-     */
 
     for (uint i = 0; i < ball.size(); ++i) {
         qmol::Pos projected(barycenter.X(),ball[i].currPos.Y(),barycenter.Z());
@@ -385,17 +430,10 @@ Pos projectOnAxis(Pos p, Vec a, Pos c){
 }
 
 void DynamicShape::rotateOnAxis(Scalar force, Vec axis){
-    /* PSEUDOCODICE:
-     * per ogni sfera
-     *      calcola la distanza dall'asse
-     *      calcola la direzione del vettore
-     *      calcola la forza del vettore in base alla distanza
-     *      somma il vec trovato alla currPos
-     */
 
     const Scalar R = prefs.R; // radius of sphere which moves exactly as the user intended
     const Scalar APPLICATION_DISTANCE = prefs.applicationDistance;
-    //if >0: molec manipulated from inside, outside follows
+    //if > 0: molec manipulated from inside, outside follows
     //if = 0: mol moves rigidly (barring centrifugal forces)
     //if < 0: mol manipuladed from the outside, inside follows
 
@@ -413,13 +451,16 @@ void DynamicShape::rotateOnAxis(Scalar force, Vec axis){
 
         Vec k = pos- proj;
 
-        k /= R;
-        Scalar nonlin =  powf(dot(k,k), APPLICATION_DISTANCE);
+        Scalar nonlin =  powf(dot(k,k)/(R*R), APPLICATION_DISTANCE);
 
         if(nonlin > 0.001){
-            Vec displacement = cross(axis,k*R)*(force/nonlin);
+            Vec displacement = cross(axis,k)*(force/nonlin);
             pos += displacement;
 
+            // =========================
+            // OPTIMIZED FOR trail = 1;
+            // =========================
+            /*
             Scalar& trail = prefs.trailing;
             if((displacement*(1-trail)).Norm() <= prefs.trailThres){ //se norm <= a soglia
                 prev += displacement*trail;
@@ -429,11 +470,11 @@ void DynamicShape::rotateOnAxis(Scalar force, Vec axis){
                prev += displacement*(trail*f);
 
             }
+            */
+            //OPTIMIZED FOR trail = 1
+            prev += displacement;
+
         }
-
-
-
-
     }
 }
 

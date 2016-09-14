@@ -2,7 +2,7 @@
 #include <GL/glew.h>
 #include <qutemolLib/glSurface.h>
 #include <qutemolLib/glProgram.h>
-#include <QDebug>
+
 
 namespace attr{
 declare_shader_attribute( position );
@@ -1030,8 +1030,9 @@ void QuteRenderer::impressUserRotation(qmol::Vec axis, qmol::Scalar angle){
 
     //ds.updateCenter();
 
-    for (int i = 0; i < 10; ++i) {
-        ds.rotateOnAxis(anglePhys/10, axis);
+    const int SUBSTEPS = 2;
+    for (int i = 0; i < SUBSTEPS; ++i) {
+        ds.rotateOnAxis(anglePhys/SUBSTEPS, axis);
     }
 
 }

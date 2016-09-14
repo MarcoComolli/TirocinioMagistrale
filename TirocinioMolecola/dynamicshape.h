@@ -5,6 +5,7 @@
 #include <qutemolLib/shape.h>
 #include "atompair.h"
 #include <preferences.h>
+#include <set>
 
 
 
@@ -28,11 +29,15 @@ public:
     std::vector<DynamicBall> ball;
     std::vector<qmol::Tube> tube;
 
+    std::set<AtomPair> probableCollisions;
+
     qmol::Pos boundSphereCenter; // bounding  sphere center
     qmol::Scalar radius; // bounding sphere radius
     qmol::Pos barycenter;
 
     qmol::Scalar error = 0;
+    int compenetrationIdx = 0;
+    int compenetrationIdxOffset = 0;
 
     DynamicShape();
     void copyFrom(const qmol::Shape& s);
@@ -45,7 +50,11 @@ public:
     void applyFixedConstrains(const PairStatistics& ps);
 
     qmol::Vec calculateSpringForce(qmol::Scalar k, qmol::Scalar springLength, int atomID, int atomIDPaired);
-    void resolveCompenetration(const PairStatistics& ps);
+    void resolveCompenetration(int idx1, int idx2);
+    void checkProbableCollisions();
+    void searchForCompenetration(int start,const PairStatistics &ps);
+    bool testCompenetration(int idx1, int idx2);
+
 
     void wiggle(qmol::Scalar entropy);
     void rotateOnYAxis(qmol::Scalar force);
@@ -62,6 +71,7 @@ public:
 
     void calculatePSBonds(PairStatistics& ps);
     PairStatistics generatePSThreshold(qmol::Scalar thresh);
+
 
 
 

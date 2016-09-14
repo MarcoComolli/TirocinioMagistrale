@@ -66,8 +66,8 @@ Matrix fromQuat( const Vec4& quat ){
 
 }
 
-const char* pVSFilePath = "F:/Documenti - Marco/Documenti/Universita/Tirocinio Magistrale/qt_workspace/TirocinioMolecola/shader.vs.glsl";
-const char* pFSFilePath = "F:/Documenti - Marco/Documenti/Universita/Tirocinio Magistrale/qt_workspace/TirocinioMolecola/shader.fs.glsl";
+const char* pVSFilePath = "E:/Tirocinio/TirocinioMolecola/shader.vs.glsl";
+const char* pFSFilePath = "E:/Tirocinio/qt_workspace/TirocinioMolecola/shader.fs.glsl";
 
 //testing
 
@@ -1133,9 +1133,9 @@ void MyRenderer::impressUserRotation(qmol::Vec axis, qmol::Scalar angle){
     rotateView( axis, -angleView  *  0.0025 );
 
     //ds.updateCenter();
-
-    for (int i = 0; i < 10; ++i) {
-        ds.rotateOnAxis(anglePhys/10, axis);
+    const int SUBSTEPS = 10;
+    for (int i = 0; i < SUBSTEPS; ++i) {
+        ds.rotateOnAxis(anglePhys/SUBSTEPS, axis);
     }
 
 }
