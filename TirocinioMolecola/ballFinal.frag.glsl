@@ -73,7 +73,6 @@ uniform float borderVariance;
 #define nl lightout.w
 
 
-
 // parametrizes: (unit sphere surface) -> [-1,+1]^2
 vec2 octMap( vec3 pos ){
 
@@ -236,7 +235,7 @@ void main(){
 #endif
 
 #if USE_SHADOW_MAP
-  vec4 realFragCoord = vec4(gl_FragCoord.xyz,1);
+ vec4 realFragCoord = vec4(gl_FragCoord.xyz,1);
   //realFragCoord.w = gl_FragCoord.w;
   realFragCoord.z -= spherePos.z*rad;
   vec4 shadowMapPos = shadowMatrix * realFragCoord;
@@ -246,7 +245,7 @@ void main(){
       shadowMapPos.x += (nl>0)? 0.0 : shadowMapPos.w;
       shadowMapPos.x *= 0.5 ;
   #endif
-  float shadowed = shadow2DProj(shadowMap,shadowMapPos).r;
+  float shadowed = shadow2DProj(shadowMap,shadowMapPos).r;//textureProj(shadowMap,shadowMapPos);//spherePos.y*spherePos.x; //shadow2DProj(shadowMap,shadowMapPos).r;
 
   #if USE_SHADOW_ATTENUATION
   shadowed = mix(shadowed, 1, shadowAttenuation );

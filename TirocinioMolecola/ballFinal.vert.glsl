@@ -33,7 +33,7 @@ void main()
 	cor = gl_Vertex.xy * radiusWithBorder;
 	radiusWithBorder *= radiusWithBorder;
 #else
-	cor = gl_Vertex.xy;
+        cor = gl_Vertex.xy;
 #endif
         uvVar = uv/16384.0;
         col = color * saturation.x + saturation.y;

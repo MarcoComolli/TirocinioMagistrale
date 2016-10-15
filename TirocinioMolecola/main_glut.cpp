@@ -52,7 +52,11 @@ void displayCallback(){
 }
 
 void displayCallbackQR(){
+
     quteRenderer.glDrawDirect();
+    quteRenderer.glViewFocusMolBarycenter();
+    //for debug purpose
+    //quteRenderer.glSplashShadowMap();
     TwDraw();
     glutSwapBuffers();
 }
@@ -122,16 +126,39 @@ void initQuteRenderer(bool firstTime){
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
-    glTranslatef(0,0,-90);
+    glTranslatef(0,0,-(quteRenderer.ds.radius*2.4));
 
     if(firstTime){
         quteRenderer.settings.directLightAmount = 0.8;
         quteRenderer.settings.ambientLightAmount = 0.7;
         quteRenderer.settings.flattenDirectLight = 0.5;
         quteRenderer.settings.borderSize = 0.0;
+
         quteRenderer.settings.glossiness = 1;
         quteRenderer.settings.shininess = 0.4;
         quteRenderer.settings.saturation = 0.95;
+
+
+        quteRenderer.settings.oppositeLightAmount = 0.0;
+
+        Vec dir = Vec(0.0,0.5,0.5);
+        quteRenderer.settings.viewLightDir =  dir.normalized();
+
+        std::cout << "Light: "  << quteRenderer.settings.viewLightDir.X() <<  " " <<
+                  quteRenderer.settings.viewLightDir.Y() << " " <<
+                  quteRenderer.settings.viewLightDir.Z() << std::endl;
+
+        quteRenderer.settings.attenuateShadows = 0.4;
+
+        //quteRenderer.settings.colorDirectLight = Vec(0.5,0.5,1.0);
+        quteRenderer.settings.colorOppositeLight = Vec(1,0,1);
+
+        quteRenderer.settings.coloredLightEnabled = false;
+
+        quteRenderer.settings.fogAmount = 0.0;
+
+        quteRenderer.settings.isShadowMapWanted = true;
+
     }
 
     quteRenderer.glResetIrradianceMap();
@@ -314,7 +341,7 @@ void initTweakBarQute(DynamicShape& ds){
     TwBar *myBar;
 
     myBar = TwNewBar("Parameters");
-    TwDefine(" Parameters size='200 480' color='0 170 0' text=light"); // change default tweak bar size and color
+    TwDefine(" Parameters size='200 500' color='0 170 0' text=light"); // change default tweak bar size and color
     TwDefine(" Parameters alpha = 30 valueswidth=60 iconalign=horizontal iconpos=tl ");
     TwDefine(" GLOBAL iconmargin='5 5' ");
     TwDefine(" GLOBAL fontsize=2 fontstyle=default contained=true buttonalign=left ");
@@ -328,8 +355,8 @@ void initTweakBarQute(DynamicShape& ds){
     TwAddVarCB(myBar, "Min variance", TW_TYPE_FLOAT, setCBMinVarQute, getCBMinVar, &ds.prefs, " min=0.0 max=5.0 step=0.01 keyIncr=o keyDecr=p help=' '");
     TwAddVarCB(myBar, "Max variance", TW_TYPE_FLOAT, setCBMaxVarQute, getCBMaxVar, &ds.prefs, " min=0.0 max=20.0 step=0.01 keyIncr=k keyDecr=l help=' '");
 
-    TwAddVarRW(myBar, "R", TW_TYPE_FLOAT, &ds.prefs.R, " min=0.1 max=200.0 step=0.1 keyIncr=k keyDecr=l help=' '");
-    TwAddVarRW(myBar, "APPLICATION DISTANCE", TW_TYPE_FLOAT, &ds.prefs.applicationDistance, " min=-10.0 max=10.0 step=0.01 keyIncr=k keyDecr=l help=' ' ");
+    TwAddVarRW(myBar, "RADIUS", TW_TYPE_FLOAT, &ds.prefs.R, " min=0.1 max=200.0 step=0.1 keyIncr=k keyDecr=l help=' '");
+    TwAddVarRW(myBar, "APPLICATION DISTANCE", TW_TYPE_FLOAT, &ds.prefs.applicationDistance, " min=-2.0 max=2.0 step=0.01 keyIncr=k keyDecr=l help=' ' ");
 
     TwAddSeparator(myBar,"sep0",NULL);
 
@@ -352,6 +379,14 @@ void initTweakBarQute(DynamicShape& ds){
     TwAddVarRW(myBar, "Glossiness", TW_TYPE_FLOAT, &quteRenderer.settings.glossiness, " min=0.0 max=1.0 step=0.01  group='Rendering settings'");
     TwAddVarRW(myBar, "Shininess", TW_TYPE_FLOAT, &quteRenderer.settings.shininess, " min=0.0 max=1.0 step=0.01  group='Rendering settings'");
     TwAddVarRW(myBar, "Saturation", TW_TYPE_FLOAT, &quteRenderer.settings.saturation, " min=0.0 max=1.0 step=0.01  group='Rendering settings'");
+    TwAddVarRW(myBar, "Opposite Light", TW_TYPE_FLOAT, &quteRenderer.settings.oppositeLightAmount, " min=0.0 max=1.0 step=0.01  group='Rendering settings'");
+    TwAddVarRW(myBar, "Fog", TW_TYPE_FLOAT, &quteRenderer.settings.fogAmount, " min=0.0 max=2.0 step=0.01  group='Rendering settings'");
+    TwAddVarRW(myBar, "Shadows", TW_TYPE_FLOAT, &quteRenderer.settings.attenuateShadows, " min=0.0 max=1.0 step=0.01  group='Rendering settings'");
+    TwAddVarRW(myBar, "Shadow Mapping", TW_TYPE_BOOL8, &quteRenderer.settings.isShadowMapWanted, " true='ENABLED' false='DISABLED' group='Rendering settings'");
+
+    //TwAddVarRW(myBar, "x", TW_TYPE_FLOAT, &quteRenderer.settings.a1, " min=-1.0 max=1.0 step=0.01 ");
+    //TwAddVarRW(myBar, "y", TW_TYPE_FLOAT, &quteRenderer.settings.a2, " min=-1.0 max=1.0 step=0.01 ");
+    //TwAddVarRW(myBar, "z", TW_TYPE_FLOAT, &quteRenderer.settings.a3, " min=-1.0 max=1.0 step=0.01 ");
 
     TwAddSeparator(myBar,"sep4",NULL);
 

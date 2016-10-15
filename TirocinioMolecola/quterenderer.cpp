@@ -107,6 +107,9 @@ QuteRenderer::QuteRenderer(){
     progFinalBall.uses( attr::color );
     progFinalBall.uses( attr::uv );
 
+    progShadowBall.uses( attr::position );
+    progShadowBall.uses( attr::radius );
+
 }
 
 
@@ -124,6 +127,7 @@ void QuteRenderer::setDynamicShape(DynamicShape &ds){
 
 void QuteRenderer::loadShadersSources(){
     progFinalBall.loadSources("F:/Documenti - Marco/Documenti/Universita/Tirocinio Magistrale/qt_workspace/TirocinioMolecola/ballFinal");
+    progShadowBall.loadSources("F:/Documenti - Marco/Documenti/Universita/Tirocinio Magistrale/qt_workspace/TirocinioMolecola/ballShadow");
 }
 
 
@@ -135,10 +139,10 @@ void QuteRenderer::updateAllDefinesInShaders(){
     progFinalBall.set( USE_COLORED_LIGHTS , settings.coloredLightEnabled );
     progFinalBall.set( USE_TWO_WAY_LIGHT , settings.oppositeLightAmount );
 
-    progFinalBall.set( USE_SHADOW_MAP , false /*isShadowMapNeeded()*/ );
+    progFinalBall.set( USE_SHADOW_MAP , (isShadowMapNeeded() && settings.isShadowMapWanted));
 
     progFinalBall .set( USE_CUT_PLANE , cutPlaneEnabled );
-
+    progShadowBall.set( USE_CUT_PLANE , cutPlaneEnabled );
 
     progFinalBall   .set( CARE_FOR_ALPHA, careForAlpha );
     //progDepthOfField.set( CARE_FOR_ALPHA, careForAlpha );
@@ -176,6 +180,31 @@ static void _glPopMatrices(){
     glMatrixMode( GL_MODELVIEW );
     glPopMatrix();
 }
+
+void _splash( glSurface& s, int k, float border, float offset){
+    _glClearMatrices();
+    bind_program(0);
+    bind_surface(0,false);
+    if (s.valid()) {
+        bind_surface_target(s,k);
+        glEnable(GL_TEXTURE_2D);
+        glColor3f(1,0.1f,1);
+    } else {
+        glColor3f(1,0,1);
+        glDisable(GL_TEXTURE_2D);
+    }
+    glDisable(GL_DEPTH_TEST);
+    const float b = border, o = offset;
+
+    glBegin(GL_QUADS);
+    glTexCoord2f(0,1);glVertex2d(0+b+o,1-b+o);
+    glTexCoord2f(0,0);glVertex2d(0+b+o,0+b+o);
+    glTexCoord2f(1,0);glVertex2d(1-b+o,0+b+o);
+    glTexCoord2f(1,1);glVertex2d(1-b+o,1-b+o);
+    glEnd();
+    _glPopMatrices();
+}
+
 
 
 void QuteRenderer::glSplashFullScreen(glSurface& surface, int w, int h , int w2, int h2, float alpha){
@@ -371,6 +400,7 @@ void QuteRenderer::maybePrepareShaders(){
     updateAllDefinesInShaders();
     //maybePrepareShader(progDepthOfField);
     maybePrepareShader(progFinalBall);
+    maybePrepareShader(progShadowBall);
 }
 
 
@@ -491,10 +521,12 @@ static void maybeSetup(glSurface & surf, int w, int h, unsigned int rtCol, const
     if (w<1) w=1; if (h<1) h=1;
     if (!surf.valid()) {
         bool res = surf.setup(w,h,0,rtCol,rtDepth);
-        //if (!res) debug("ALARM setup!!!"); //else qDebug("shadowmap %dx%d setup ok",w,h);
+//        if (!res) std::cout << "ALARM setup!!!" << std::endl;
+//        else std::cout << "shadowmap setup ok" << w << " x " << h << std::endl;
     } else {
         bool res = surf.resize(w,h,0);
-        //if (!res) debug("ALARM resize!!!"); //else qDebug("shadowmap %dx%d resize ok",w,h);
+//        if (!res) std::cout << "ALARM resize!!!" << std::endl;
+//        else std::cout << "shadowmap resize ok" << w << " x " << h << std::endl;
     }
 
 }
@@ -597,7 +629,7 @@ bool QuteRenderer::glProgressIrradianceMap(int nSteps ){
     for (int i=0; i<nSteps; i++) {
         updateShadowmapParam( randomDir[ cumulatedIrradiance + i ] );
         //glRenderAoShadowMap();
-        glEnable(GL_BLEND);
+        //glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
         glRenderOnIrradianceMap();
         glDisable(GL_BLEND);
@@ -650,6 +682,9 @@ void QuteRenderer::glDrawHiRes(){
     //settings.background = oldC;
 }
 
+void QuteRenderer::glSplashShadowMap(){
+    _splash(shadowMap,-1, 0.2f,0.05f);
+}
 
 void QuteRenderer::glDrawOnTextureAndSplash(bool useDof, int superSample, glSurface &surface){
 
@@ -859,9 +894,10 @@ void QuteRenderer::glDrawDirect(){
 
     maybePrepareShaders();
 
-    directShadowMapEnabled =  false;//isShadowMapNeeded() ;
+    directShadowMapEnabled =  (isShadowMapNeeded() && settings.isShadowMapWanted);
 
     if (directShadowMapEnabled) {
+        glCaptureCurrentMatrices();
         updateShadowmapParam( viewSpaceVec2molSpaceVec( -settings.viewLightDir ) );
         glRenderShadowMap();
     }
@@ -964,7 +1000,7 @@ void QuteRenderer::glDrawDirect(){
         progFinalBall.set( unif::shadowAttenuation, settings.attenuateShadows );
     }
 
-    if ( false /*isShadowMapNeeded()*/ ) {
+    if ( isShadowMapNeeded() && settings.isShadowMapWanted){
         progFinalBall.set( unif::shadowMap, 1);
         glActiveTexture( GL_TEXTURE1 );
 
@@ -1002,18 +1038,30 @@ void QuteRenderer::glDrawDirect(){
 
     glSendBallData();
     bind_program(0);
-    //std::cout << "ds balls: " << ds.barycenter.X() << " "  << ds.barycenter.Y() << std::endl;
 }
 
 void QuteRenderer::glCenterView(){
     //glScalef( 1/ds.radius , 1/ds.radius, 1/ds.radius);
     glTranslatef( -ds.barycenter[0],-ds.barycenter[1], -ds.barycenter[2] );
+    prevViewTranslation = ds.barycenter;
+}
+
+void QuteRenderer::glViewFocusMolBarycenter(){
+
+    Vec deltaBarycenter = prevViewTranslation - ds.barycenter;
+    glTranslatef( deltaBarycenter.X(), deltaBarycenter.Y(), deltaBarycenter.Z() );
+    prevViewTranslation = ds.barycenter;
+
 }
 
 
 
 void QuteRenderer::glZoomView(float amount){
+    glMatrixMode(GL_MODELVIEW);
+    //glPopMatrix();
+    //glLoadIdentity();
     glTranslatef( 0,0, amount);
+
 }
 
 void QuteRenderer::glRotY(float amount){

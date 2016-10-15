@@ -66,8 +66,8 @@ Matrix fromQuat( const Vec4& quat ){
 
 }
 
-const char* pVSFilePath = "E:/Tirocinio/TirocinioMolecola/shader.vs.glsl";
-const char* pFSFilePath = "E:/Tirocinio/qt_workspace/TirocinioMolecola/shader.fs.glsl";
+const char* pVSFilePath = "F:/Documenti - Marco/Documenti/Universita/Tirocinio Magistrale/qt_workspace/TirocinioMolecola/shader.vs.glsl";
+const char* pFSFilePath = "F:/Documenti - Marco/Documenti/Universita/Tirocinio Magistrale/qt_workspace/TirocinioMolecola/shader.fs.glsl";
 
 //testing
 
@@ -435,7 +435,7 @@ void MyRenderer::init(){
 
     generateBuffers(ds.prefs);
 
-    glClearColor(0.17f, 0.20f, 0.20f, 0.0f);
+    glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
 
 
     std::cout << "GL VERSION: " << glGetString(GL_VERSION) << endl;
@@ -449,7 +449,7 @@ void MyRenderer::init(){
 
 
     //glBlendFunc(GL_ZERO, GL_SRC_COLOR);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
     glEnable(GL_BLEND);
 
 
@@ -558,7 +558,9 @@ void MyRenderer::render(){
 
     Vec scale(0.02,0.02,0.001);
 
-     model.SetTranslate(-ds.barycenter);
+   // model.SetTranslate(-ds.barycenter);
+    view.SetTranslate(-ds.barycenter);
+   // model.SetTranslate(-3,0,0);
 
 //   model.SetTranslate(-(ds.barycenter.X()/scale.X()),
 //                       -(ds.barycenter.Y()/scale.Y()),
@@ -831,7 +833,7 @@ void MyRenderer::generateBuffers(Preferences prefs){
     vector<bool> showBonds = getBoundIndexesForRendering(prefs,ps);
 
 
-     glUniform3f(lineColor,0.5,1.0,1.0);
+    glUniform3f(lineColor,0.0,1.0,1.0);
     if (showBonds[0]) {
         for (int i = ps.intersectStartIdx; i <= ps.intersectEndIdx; ++i) {
             a1 =  ps.pairs[i].atomID1;
@@ -995,7 +997,7 @@ void MyRenderer::updateBuffers(PairStatistics ps){
 
 
 
-    glUniform3f(lineColor,0.6,0.6,0.6);
+    glUniform3f(lineColor,1.0,1.0,1.0);
     if (showBonds[0]) {
         for (int i = ps.intersectStartIdx; i <= ps.intersectEndIdx; ++i) {
             a1 =  ps.pairs[i].atomID1;
@@ -1024,7 +1026,7 @@ void MyRenderer::updateBuffers(PairStatistics ps){
         }
     }
 
-    glUniform3f(lineColor,0.0,6.0,0.0);
+    glUniform3f(lineColor,1.0,0.0,0.2);
     if (showBonds[1]) {
         for (int i = ps.hardStartIdx; i <= ps.hardEndIdx; ++i) {
             a1 =  ps.pairs[i].atomID1;
@@ -1053,7 +1055,7 @@ void MyRenderer::updateBuffers(PairStatistics ps){
         }
     }
 
-    glUniform3f(lineColor,0.6,0.0,0.6);
+    glUniform3f(lineColor,0.0,0.7,0.0);
     if (showBonds[2]) {
         for (int i = ps.softStartIdx; i <= ps.softEndIdx; ++i) {
             a1 =  ps.pairs[i].atomID1;

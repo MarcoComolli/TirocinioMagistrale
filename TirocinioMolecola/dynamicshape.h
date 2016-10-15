@@ -50,6 +50,8 @@ public:
     void applyFixedConstrains(const PairStatistics& ps);
 
     qmol::Vec calculateSpringForce(qmol::Scalar k, qmol::Scalar springLength, int atomID, int atomIDPaired);
+
+    void initCollisionDetection();
     void resolveCompenetration(int idx1, int idx2);
     void checkProbableCollisions();
     void searchForCompenetration(int start,const PairStatistics &ps);
@@ -71,6 +73,7 @@ public:
 
     void calculatePSBonds(PairStatistics& ps);
     PairStatistics generatePSThreshold(qmol::Scalar thresh);
+
 
 
 

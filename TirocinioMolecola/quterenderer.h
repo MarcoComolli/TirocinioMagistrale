@@ -68,6 +68,13 @@ public:
     /* dynamics methods*/
     void impressUserRotation(qmol::Vec axis, qmol::Scalar angle);
 
+    void glSplashShadowMap();
+
+    bool isShadowMapNeeded() const;
+
+    Vec prevViewTranslation;
+    void glViewFocusMolBarycenter();
+
 private:
 
     PerformanceSettings performanceSettings;
@@ -107,7 +114,7 @@ private:
     void glRenderShadowMap();
     void glRenderDepthMap(glSurface& target, int res, bool doubleSided, bool bilinear);
 
-    bool isShadowMapNeeded() const;
+
     bool isLightDirTrivial() const;
     bool directShadowMapEnabled;
 
@@ -138,6 +145,7 @@ private:
 
     void glSplashFullScreen(glSurface& glSurface, int w, int h , int w2, int h2, float alpha);
     void glSplashWithDepthOfField(glSurface& glSurface, int w, int h , int w2, int h2, float multisample);
+
     void glSendShadowmapParam(qmol::glProgram &p) const;
     void glSendCutPlaneParam(qmol::glProgram &p) const;
 

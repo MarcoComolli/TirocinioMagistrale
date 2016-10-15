@@ -81,7 +81,9 @@ SOURCES += $$GLEW_PATH/src/glew.c \
 
 DISTFILES += \
     ballFinal.frag.glsl \
-    ballFinal.vert.glsl
+    ballFinal.vert.glsl \
+    ballShadow.vert.glsl\
+    ballShadow.frag.glsl\
 
 
 

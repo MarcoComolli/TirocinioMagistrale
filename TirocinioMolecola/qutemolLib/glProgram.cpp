@@ -404,6 +404,8 @@ GLuint glProgram::create_shader(GLenum type, const char * prefix, const char * s
     //compile_log += "*********************\n";
     compile_log += "\n";
 
+    std::cout << compile_log << std::endl;
+
     if (cs == GL_FALSE)
     {
         glDeleteShader(shd);

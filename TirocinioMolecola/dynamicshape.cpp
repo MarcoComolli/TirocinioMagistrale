@@ -31,6 +31,7 @@ void DynamicShape::copyFrom(const qmol::Shape& s){
 
    std::cout << "THE BARYCENTER: " << printPos(barycenter) << std::endl;
 
+
 }
 
 void DynamicShape::clear(){
@@ -97,6 +98,14 @@ void DynamicShape::applyFixedConstrains(const PairStatistics& ps){
     }
 }
 
+void DynamicShape::initCollisionDetection(){
+    probableCollisions.clear();
+    compenetrationIdx = 0;
+    compenetrationIdxOffset = 0;
+
+}
+
+
 void DynamicShape::resolveCompenetration(int idx1, int idx2){
 
     DynamicBall b1 = ball[idx1];
@@ -109,17 +118,25 @@ void DynamicShape::resolveCompenetration(int idx1, int idx2){
 
     ball[idx1].prevPos =  ball[idx1].currPos;
     ball[idx2].prevPos =  ball[idx2].currPos;
+    //ball[idx1].col = Col(0,1,0);
+    //ball[idx2].col = Col(0,0,1);
 
 }
 
 void DynamicShape::searchForCompenetration(int start,const PairStatistics& ps){
-    int pairsToBeTested = 100;
-    int interval = 100;
+    int pairsToBeTested = 1000;
+    int interval = rand()%700+10;
     int atomIdx1 = start;
     int atomIdx2;
     bool areTheyIntersectBond = false;
+
     for (int i = 0; i < pairsToBeTested; ++i){
         atomIdx2 = (atomIdx1+interval+compenetrationIdxOffset)%ball.size();
+
+        //for visualization
+        //ball[atomIdx1].col = Col(1,0,0);
+        //ball[atomIdx2].col = Col(0,1,1);
+
         if(testCompenetration(atomIdx1,atomIdx2)){
             for (int j = ps.intersectStartIdx; j < ps.intersectEndIdx; ++j) {
                 if(ps.pairs[j].compareTo(AtomPair(atomIdx1,atomIdx2))){
@@ -172,6 +189,7 @@ bool DynamicShape::testCompenetration(int idx1, int idx2){
 
 
 void DynamicShape::doPhysicsStep(Scalar dt, const PairStatistics& ps){
+
     if (prefs.softBonds) {
         applySprings(ps,dt);
     }
@@ -449,7 +467,7 @@ void DynamicShape::rotateOnAxis(Scalar force, Vec axis){
         //pos += cross(axis,pos - proj)*force;
 
 
-        Vec k = pos- proj;
+        Vec k = pos - proj;
 
         Scalar nonlin =  powf(dot(k,k)/(R*R), APPLICATION_DISTANCE);
 

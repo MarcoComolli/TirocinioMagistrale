@@ -96,10 +96,6 @@ vector<qmol::Shape> getShapes(wstring filename){
         }
 
     }
-    std::cout << "indirizzo shapes " << &shapes  << std::endl;
-    std::cout << "shapes size init " << shapes.size()  << std::endl;
-    std::cout << "shapes  altra size init " << (*(&shapes)).size()  << std::endl;
-
 
     return shapes;
 }
@@ -126,7 +122,7 @@ void initComponents(Preferences& prefs, bool isQuteRendering){
     vector<qmol::Shape> shapes = getShapes(prefs.molPath);
 
     if (isQuteRendering) {
-        DynamicShape& ds (quteRenderer.ds);
+        DynamicShape& ds(quteRenderer.ds);
         ds.copyFrom(shapes[0]);
         ds.prefs = prefs;
         SpatialGrid &gr(quteRenderer.grid);
@@ -139,7 +135,7 @@ void initComponents(Preferences& prefs, bool isQuteRendering){
         }
 
         ps.calculateStats();
-        ps.printStats();
+        //ps.printStats();
 
         cout << "rispetto al max: " << ds.ball.size()*ds.ball.size() << " e': " << ps.pairs.size() <<
                 "\nCioe' " << ds.ball.size()*(qmol::Scalar)ds.ball.size()/ps.pairs.size() << " volte meno numeroso" << endl;
@@ -149,6 +145,11 @@ void initComponents(Preferences& prefs, bool isQuteRendering){
         ps.printStats();
 
         ps.updateDistancesFromShape(shapes[0]);
+
+        ds.initCollisionDetection();
+
+
+        prefs.R = ds.radius/2;
 
     }
     else{
@@ -178,11 +179,6 @@ void initComponents(Preferences& prefs, bool isQuteRendering){
         ps.updateDistancesFromShape(shapes[0]);
     }
 
-
-
-
-
-
 }
 
 
@@ -208,7 +204,7 @@ void processMouse(int button, int state, int x, int y, int modifiers){
         quteRenderer.glZoomView(-1);
     }
     if(button == SCROLL_UP){
-        //renderer.panZ++;
+        //renderer.panZ++;;
         quteRenderer.glZoomView(1);
 
     }
@@ -257,6 +253,7 @@ void processKey(unsigned char key){
         //dsglobal.ball[0].prevPos.X() += 20;
         renderer.ds.wiggle(0.9f);
         renderer.ds.updateBarycenter();
+        quteRenderer.ds.updateBarycenter();
         break;
     case 'c':
     {
