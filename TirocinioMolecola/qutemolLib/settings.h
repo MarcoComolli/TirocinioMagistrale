@@ -57,7 +57,7 @@ struct RenderingSettings{
     float attenuateShadows;  // e.g.: if 0.5, 50% of direct lights passes even in shadow
     bool isShadowMapWanted;
 
-    int a1,a2,a3;
+    double lightDirection[3] = {-0.8,-0.8,-1.2};
 
 
 

@@ -38,7 +38,7 @@ public:
 
     std::wstring molPath = L"F:/Programmazione/inputs/p53_tumor_suppressor_3SAK.pdb";
 
-
+    int colorizeMode = 0;
 
 
     bool showGrid = false;

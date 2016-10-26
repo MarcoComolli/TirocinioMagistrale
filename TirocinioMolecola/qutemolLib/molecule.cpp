@@ -599,8 +599,6 @@ void Molecule::fillShape(Shape &p, const ShapingOptions &opt,
     Scalar colPerModel = std::max(-1+opt.colorizeMode, 0.0f);
     Scalar colPerChain = 1 - colPerAtom - colPerModel;
 
-
-    int kk = 0;
     for (int si=-1; si<(int)symmetry.size(); si++)
     for (uint i=0; i<atom.size(); i++) {
         const Atom& a (atom[i]);

@@ -51,14 +51,20 @@ void displayCallback(){
     glutSwapBuffers();
 }
 
+void updateLightDir(){
+    Vec dir = Vec(quteRenderer.settings.lightDirection[0],
+            quteRenderer.settings.lightDirection[1],
+            quteRenderer.settings.lightDirection[2]);
+    quteRenderer.settings.viewLightDir =  (-dir).normalized();
+}
+
 void displayCallbackQR(){
 
     quteRenderer.glDrawDirect();
     quteRenderer.glViewFocusMolBarycenter();
-    //for debug purpose
-    //quteRenderer.glSplashShadowMap();
     TwDraw();
     glutSwapBuffers();
+    updateLightDir();
 }
 
 static void mouseCallback(int btn, int state, int x, int y){
@@ -141,12 +147,10 @@ void initQuteRenderer(bool firstTime){
 
         quteRenderer.settings.oppositeLightAmount = 0.0;
 
-        Vec dir = Vec(0.0,0.5,0.5);
-        quteRenderer.settings.viewLightDir =  dir.normalized();
-
-        std::cout << "Light: "  << quteRenderer.settings.viewLightDir.X() <<  " " <<
-                  quteRenderer.settings.viewLightDir.Y() << " " <<
-                  quteRenderer.settings.viewLightDir.Z() << std::endl;
+//        Vec dir = Vec(quteRenderer.settings.lightDirection[0],
+//                      quteRenderer.settings.lightDirection[1],
+//                      quteRenderer.settings.lightDirection[2]);
+//        quteRenderer.settings.viewLightDir =  dir.normalized();
 
         quteRenderer.settings.attenuateShadows = 0.4;
 
@@ -160,6 +164,8 @@ void initQuteRenderer(bool firstTime){
         quteRenderer.settings.isShadowMapWanted = true;
 
     }
+
+
 
     quteRenderer.glResetIrradianceMap();
 
@@ -247,6 +253,11 @@ void TW_CALL setCBExtraBondsQute(const void *value, void *clientData){
     quteRenderer.geometryChanged();
 }
 
+void TW_CALL setColorizeMode(const void *value, void *clientData){
+    (*(Preferences *)(clientData)).colorizeMode = *(const int *)value;
+    initComponents(*(Preferences *) (clientData), true);
+}
+
 
 
 //getters
@@ -273,6 +284,11 @@ void TW_CALL getCBMaxVar(void *value, void *clientData){
 void TW_CALL getCBMinVar(void *value, void *clientData){
     *(float *)value = (*(Preferences *)(clientData)).minVarianceTrhesh;
 }
+
+void TW_CALL getColorizeMode(void *value, void *clientData){
+    *(int *)value = (*(Preferences *)(clientData)).colorizeMode;
+}
+
 
 void initTweakBar(DynamicShape& ds){
     TwInit(TW_OPENGL, NULL);
@@ -372,6 +388,7 @@ void initTweakBarQute(DynamicShape& ds){
 
     TwAddSeparator(myBar,"sep3",NULL);
 
+    TwAddVarCB(myBar, "Color type", TW_TYPE_INT32, setColorizeMode, getColorizeMode, &ds.prefs, " min=0 max=2  group='Rendering settings'");
     TwAddVarRW(myBar, "Direct Light", TW_TYPE_FLOAT, &quteRenderer.settings.directLightAmount, " min=0.0 max=1.0 step=0.01  group='Rendering settings'");
     TwAddVarRW(myBar, "Flat Direct Light", TW_TYPE_FLOAT, &quteRenderer.settings.flattenDirectLight, " min=0.0 max=1.0 step=0.01  group='Rendering settings'");
     TwAddVarRW(myBar, "Ambient Light", TW_TYPE_FLOAT, &quteRenderer.settings.ambientLightAmount, " min=0.0 max=1.0 step=0.01  group='Rendering settings'");
@@ -387,6 +404,9 @@ void initTweakBarQute(DynamicShape& ds){
     //TwAddVarRW(myBar, "x", TW_TYPE_FLOAT, &quteRenderer.settings.a1, " min=-1.0 max=1.0 step=0.01 ");
     //TwAddVarRW(myBar, "y", TW_TYPE_FLOAT, &quteRenderer.settings.a2, " min=-1.0 max=1.0 step=0.01 ");
     //TwAddVarRW(myBar, "z", TW_TYPE_FLOAT, &quteRenderer.settings.a3, " min=-1.0 max=1.0 step=0.01 ");
+
+    TwAddVarRW(myBar, "LightDir", TW_TYPE_DIR3D, &quteRenderer.settings.lightDirection, "group='Rendering settings'");
+
 
     TwAddSeparator(myBar,"sep4",NULL);
 

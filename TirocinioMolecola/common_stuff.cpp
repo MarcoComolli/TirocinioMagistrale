@@ -64,7 +64,7 @@ MyRenderer renderer;
 QuteRenderer quteRenderer;
 
 
-vector<qmol::Shape> getShapes(wstring filename){
+vector<qmol::Shape> getShapes(wstring filename, Preferences& prefs){
     qmol::Molecule mol;
 
 
@@ -84,11 +84,12 @@ vector<qmol::Shape> getShapes(wstring filename){
 //        opt.colorizeMode = 0;
 //        opt.showOnlyModel = -1;
         opt.setDefaults();
+        opt.colorizeMode = prefs.colorizeMode;
 
         AtomTable table;
         table.loadCSV("F:/Programmazione/qtmol/qutemol2/qutemolLib/atomTable.csv");
         ChainTable chaintable;
-        chaintable.setRandom(400);
+        chaintable.setRandom(153);
 
         for (int i = 1; i < mol.nModels() + 1 ; i++) { //per ogni modello
             mol.makeSingleShape(shape,opt,table, chaintable, i);  //crea lo shape di id = i
@@ -119,7 +120,7 @@ void initGrid(DynamicShape& ds, SpatialGrid& gr){
 
 void initComponents(Preferences& prefs, bool isQuteRendering){
 
-    vector<qmol::Shape> shapes = getShapes(prefs.molPath);
+    vector<qmol::Shape> shapes = getShapes(prefs.molPath, prefs);
 
     if (isQuteRendering) {
         DynamicShape& ds(quteRenderer.ds);
