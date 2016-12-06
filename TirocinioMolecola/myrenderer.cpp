@@ -558,8 +558,8 @@ void MyRenderer::render(){
 
     Vec scale(0.02,0.02,0.001);
 
-   // model.SetTranslate(-ds.barycenter);
-    view.SetTranslate(-ds.barycenter);
+    model.SetTranslate(-ds.barycenter);
+   // view.SetTranslate(-ds.barycenter);
    // model.SetTranslate(-3,0,0);
 
 //   model.SetTranslate(-(ds.barycenter.X()/scale.X()),
@@ -588,8 +588,8 @@ void MyRenderer::render(){
     sendMatrix( modelMatrixID, model );
     sendMatrix( viewMatrixID, view );
 
-    vec3 lightPos = vec3(9.55,17.5,0.5);
-    glUniform3f(lightID, lightPos.x, lightPos.y, lightPos.z);
+    //vec3 lightPos = vec3(9.55,17.5,0.5);
+    //glUniform3f(lightID, lightPos.x, lightPos.y, lightPos.z);
 
     //printCubes();
     //printLines();
@@ -843,6 +843,8 @@ void MyRenderer::generateBuffers(Preferences prefs){
             v1 = vec3(b1.currPos.X(), b1.currPos.Y(), b1.currPos.Z());
             v2 = vec3(b2.currPos.X(), b2.currPos.Y(), b2.currPos.Z());
 
+
+
             //variances.push_back(ps.pairs[i].variance);
            // std::cout << "var: " << ps.pairs[i].variance << std::endl;
             if(renderCentersSelector.at(a1) == false){
@@ -1026,7 +1028,7 @@ void MyRenderer::updateBuffers(PairStatistics ps){
         }
     }
 
-    glUniform3f(lineColor,1.0,0.0,0.2);
+    glUniform3f(lineColor,1.0,0.0,1.0);
     if (showBonds[1]) {
         for (int i = ps.hardStartIdx; i <= ps.hardEndIdx; ++i) {
             a1 =  ps.pairs[i].atomID1;
@@ -1055,7 +1057,7 @@ void MyRenderer::updateBuffers(PairStatistics ps){
         }
     }
 
-    glUniform3f(lineColor,0.0,0.7,0.0);
+    glUniform3f(lineColor,0.0,0.9,0.0);
     if (showBonds[2]) {
         for (int i = ps.softStartIdx; i <= ps.softEndIdx; ++i) {
             a1 =  ps.pairs[i].atomID1;
@@ -1135,7 +1137,7 @@ void MyRenderer::impressUserRotation(qmol::Vec axis, qmol::Scalar angle){
     rotateView( axis, -angleView  *  0.0025 );
 
     //ds.updateCenter();
-    const int SUBSTEPS = 10;
+    const int SUBSTEPS = 5;
     for (int i = 0; i < SUBSTEPS; ++i) {
         ds.rotateOnAxis(anglePhys/SUBSTEPS, axis);
     }

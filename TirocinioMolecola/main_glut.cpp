@@ -439,7 +439,7 @@ int main(int argc, char** argv){
     else{
         initComponents(renderer.ds.prefs, isQuteRendering); //wireframe Renderer
 
-        // Check if glew is ok
+//        // Check if glew is ok
         renderer.init();
 
         glutDisplayFunc(displayCallback); //funzione invocata quando c'è del rendering da fare

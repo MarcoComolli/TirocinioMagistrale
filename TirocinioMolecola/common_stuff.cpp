@@ -178,6 +178,11 @@ void initComponents(Preferences& prefs, bool isQuteRendering){
         ps.printStats();
 
         ps.updateDistancesFromShape(shapes[0]);
+
+        ds.initCollisionDetection();
+
+
+        prefs.R = ds.radius/2;
     }
 
 }

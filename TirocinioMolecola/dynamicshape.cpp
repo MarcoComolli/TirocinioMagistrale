@@ -228,8 +228,8 @@ void DynamicShape::doPhysicsStep(Scalar dt, const PairStatistics& ps){
     compenetrationIdx = (compenetrationIdx+1)%ball.size();
     if(compenetrationIdx == 0) {
         compenetrationIdxOffset = (compenetrationIdxOffset+1)%ball.size();
-        std::cout << "compenetrationIdxOffset +1! -> " << compenetrationIdxOffset << std::endl;
-        std::cout << "da testare: " << probableCollisions.size() << std::endl;
+        //std::cout << "compenetrationIdxOffset +1! -> " << compenetrationIdxOffset << std::endl;
+        //std::cout << "da testare: " << probableCollisions.size() << std::endl;
     }
 
 }
